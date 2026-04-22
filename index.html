@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Earth Tennis Club: 網球等級評估、球友配對、聊天約球、全台球場地圖與交流社群。"
+      content="Earth Tennis Club：網球球員卡、球友配對、約球排程、全台球場地圖與交流社群。"
     />
     <title>Earth Tennis Club</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -18,11 +18,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      crossorigin=""
-    />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <link rel="stylesheet" href="./assets/css/styles.css" />
   </head>
   <body>
@@ -34,12 +30,10 @@
       <div class="hero-copy">
         <p class="eyebrow">Tennis Social Platform</p>
         <h1><span>Earth</span> Tennis Club</h1>
-        <p class="subtitle">
-          網球等級評估、球友配對、球場資訊與互動社群的一站式前端平台
-        </p>
+        <p class="subtitle">網球球員卡、NTRP 配對、約球排程與全台球場資訊一站搞定</p>
         <div class="hero-tags">
-          <span>UTR + NTRP</span>
-          <span>Find Tennis Partners</span>
+          <span>NTRP 自我評估</span>
+          <span>球員卡配對</span>
           <span>Taiwan Court Map</span>
         </div>
       </div>
@@ -51,161 +45,178 @@
             <p class="metric-label">全台縣市覆蓋</p>
           </article>
           <article class="metric">
-            <p class="metric-value">2 種</p>
-            <p class="metric-label">等級系統評估</p>
+            <p class="metric-value">NTRP</p>
+            <p class="metric-label">等級自我評定</p>
           </article>
           <article class="metric">
             <p class="metric-value">1 站式</p>
-            <p class="metric-label">配對 + 聊天 + 約球</p>
+            <p class="metric-label">配對 + 球員卡 + 約球</p>
           </article>
         </div>
       </aside>
     </header>
 
     <nav class="tab-nav" aria-label="主功能分頁">
-      <button class="tab-button is-active" data-view="assessment">等級評估</button>
-      <button class="tab-button" data-view="members">會員系統</button>
-      <button class="tab-button" data-view="matching">球友配對</button>
-      <button class="tab-button" data-view="chat">聊天約球</button>
+      <button class="tab-button is-active" data-view="members">球員管理</button>
+      <button class="tab-button" data-view="matching">球友推薦</button>
+      <button class="tab-button" data-view="invite">約打球</button>
       <button class="tab-button" data-view="courts">全台球場</button>
       <button class="tab-button" data-view="forum">交流區</button>
       <button class="tab-button" data-view="security">架構與資安</button>
     </nav>
 
     <main class="app-main">
-      <section class="view is-active" id="view-assessment" data-view="assessment">
-        <div class="card">
-          <h2>自我評價問卷（UTR + NTRP）</h2>
-          <p>完成技術題目後可取得估算等級，並可一鍵帶入會員資料。</p>
-          <form id="assessment-form" class="stack"></form>
-          <div class="actions">
-            <button class="btn-primary" id="assessment-submit" type="button">計算等級</button>
-            <button class="btn-secondary" id="assessment-reset" type="button">清除</button>
-          </div>
-        </div>
-        <div class="card result-card" id="assessment-result" aria-live="polite">
-          <h3>評估結果</h3>
-          <p>尚未計算。</p>
-        </div>
-        <div class="card">
-          <h3>評估歷史紀錄</h3>
-          <div id="assessment-history" class="list"><p class="hint">尚無評估紀錄。</p></div>
-        </div>
-      </section>
 
-      <section class="view" id="view-members" data-view="members">
+      <!-- 球員管理 -->
+      <section class="view is-active" id="view-members" data-view="members">
         <div class="grid-two">
-          <div class="card">
-            <h2>會員註冊 / 更新</h2>
-            <form id="member-form" class="stack">
-              <label>暱稱<input required name="name" maxlength="30" /></label>
-              <label>所在地區
-                <select required name="city" id="member-city"></select>
-              </label>
-              <label>性別
-                <select required name="gender">
-                  <option value="female">女</option>
-                  <option value="male">男</option>
-                  <option value="non_binary">非二元</option>
-                  <option value="prefer_not_to_say">不透露</option>
-                </select>
-              </label>
-              <label>年齡<input required name="age" type="number" min="10" max="90" /></label>
-              <label>球齡（年）<input required name="yearsPlaying" type="number" min="0" max="70" /></label>
-              <label>慣用場地
-                <select required name="preferredSurface">
-                  <option value="hard">硬地</option>
-                  <option value="clay">紅土</option>
-                  <option value="grass">草地</option>
-                  <option value="synthetic">合成地</option>
-                </select>
-              </label>
-              <label>可打球時段
-                <input name="availability" placeholder="例：平日晚上、週六上午" maxlength="80" />
-              </label>
-              <label>UTR（可由問卷帶入）<input name="utr" type="number" step="0.1" min="1" max="16.5" /></label>
-              <label>NTRP（可由問卷帶入）<input name="ntrp" type="number" step="0.5" min="1" max="7" /></label>
-              <div class="actions">
-                <button class="btn-primary" type="submit">儲存會員</button>
-              </div>
-            </form>
-          </div>
 
+          <!-- 左：目前使用者 + 切換 -->
           <div class="card">
-            <h2>目前登入會員（示範）</h2>
+            <h2>目前登入球員</h2>
             <label>切換使用者
               <select id="current-user-select"></select>
             </label>
-            <p id="current-user-summary">尚未選擇會員。</p>
-          </div>
-        </div>
+            <div id="current-user-card" class="current-card-wrap"></div>
+            <div class="actions" style="margin-top:0.8rem;">
+              <button class="btn-secondary" id="member-edit-toggle" type="button">編輯球員卡</button>
+            </div>
 
-        <div class="card">
-          <h2>球友資料公開列表</h2>
-          <div class="inline-filters">
-            <label>地區
-              <select id="member-filter-city"></select>
-            </label>
-            <label>最低 NTRP
-              <select id="member-filter-level">
-                <option value="0">不限</option>
-                <option value="2.0">2.0+</option>
-                <option value="2.5">2.5+</option>
-                <option value="3.0">3.0+</option>
-                <option value="3.5">3.5+</option>
-                <option value="4.0">4.0+</option>
-              </select>
-            </label>
-            <button id="member-filter-run" class="btn-secondary" type="button">篩選</button>
+            <!-- 編輯球員卡（預設隱藏） -->
+            <div id="member-form-card" style="display:none; margin-top:1rem;">
+              <h3>編輯球員卡</h3>
+              <form id="member-form" class="stack">
+                <input type="hidden" name="id" />
+                <label>暱稱<input required name="name" maxlength="30" /></label>
+                <label>所在地區
+                  <select required name="city" id="member-city"></select>
+                </label>
+                <label>性別
+                  <select required name="gender">
+                    <option value="female">女</option>
+                    <option value="male">男</option>
+                    <option value="non_binary">非二元</option>
+                    <option value="prefer_not_to_say">不透露</option>
+                  </select>
+                </label>
+                <label>身高（cm，選填）<input name="height" type="number" min="100" max="230" placeholder="例：172" /></label>
+                <label>年齡<input required name="age" type="number" min="10" max="90" /></label>
+                <label>球齡（年）<input required name="yearsPlaying" type="number" min="0" max="70" /></label>
+                <label>慣用場地
+                  <select required name="preferredSurface">
+                    <option value="hard">硬地</option>
+                    <option value="clay">紅土</option>
+                    <option value="grass">草地</option>
+                    <option value="synthetic">合成地</option>
+                  </select>
+                </label>
+                <label>擅長打法
+                  <select name="playStyle">
+                    <option value="baseline">底線型</option>
+                    <option value="serve_volley">上網型</option>
+                    <option value="all_court">全場型</option>
+                    <option value="defensive">防守型</option>
+                    <option value="aggressive">進攻型</option>
+                  </select>
+                </label>
+                <label>可打球時段
+                  <input name="availability" placeholder="例：平日晚上、週六上午" maxlength="80" />
+                </label>
+
+                <!-- NTRP 自我評估（嵌入式） -->
+                <div class="ntrp-section">
+                  <div class="ntrp-header">
+                    <label>NTRP 等級
+                      <input name="ntrp" type="number" step="0.5" min="1.5" max="7" />
+                    </label>
+                    <button class="btn-secondary ntrp-toggle-btn" id="ntrp-assess-toggle" type="button">展開 NTRP 自我評估</button>
+                  </div>
+                  <div id="ntrp-assess-panel" style="display:none;">
+                    <p class="hint">回答以下問題，系統將自動估算你的 NTRP 等級</p>
+                    <form id="ntrp-assess-form" class="ntrp-questions"></form>
+                    <div class="actions">
+                      <button class="btn-secondary" id="ntrp-assess-submit" type="button">計算 NTRP</button>
+                    </div>
+                    <p id="ntrp-assess-result" class="hint ntrp-result" style="display:none;"></p>
+                  </div>
+                </div>
+
+                <!-- 照片上傳 -->
+                <label>球員照片（選填，最大 2MB）
+                  <input type="file" id="member-photo-input" accept="image/*" />
+                </label>
+                <img id="member-photo-preview" src="" alt="照片預覽" style="display:none; width:80px; height:80px; object-fit:cover; border-radius:50%; margin-top:0.4rem;" />
+
+                <div class="actions">
+                  <button class="btn-primary" type="submit">儲存球員卡</button>
+                </div>
+              </form>
+            </div>
           </div>
-          <div id="member-list" class="list"></div>
+
+          <!-- 右：球員列表篩選 -->
+          <div class="card">
+            <h2>球員列表</h2>
+            <div class="inline-filters">
+              <label>地區
+                <select id="member-filter-city"></select>
+              </label>
+              <label>最低 NTRP
+                <select id="member-filter-level">
+                  <option value="0">不限</option>
+                  <option value="2.0">2.0+</option>
+                  <option value="2.5">2.5+</option>
+                  <option value="3.0">3.0+</option>
+                  <option value="3.5">3.5+</option>
+                  <option value="4.0">4.0+</option>
+                </select>
+              </label>
+              <button id="member-filter-run" class="btn-secondary" type="button">篩選</button>
+            </div>
+            <div id="member-list" class="player-card-grid"></div>
+          </div>
         </div>
       </section>
 
+      <!-- 球友推薦 -->
       <section class="view" id="view-matching" data-view="matching">
         <div class="card">
-          <h2>球友配對建議</h2>
-          <p>依據地區、等級差距、球齡與時段文字相似度計算。</p>
+          <h2>球友智慧推薦</h2>
+          <p class="hint">系統依據 NTRP 等級、球齡、地區與可打球時段，自動找出最適合的球友。</p>
           <div class="actions">
-            <button id="run-matching" class="btn-primary" type="button">產生配對建議</button>
+            <button id="run-matching" class="btn-primary" type="button">一鍵找球友</button>
           </div>
-          <div id="matching-results" class="list"></div>
+          <p id="matching-empty" class="hint" style="margin-top:0.6rem;"></p>
+          <div id="matching-results" class="player-card-grid"></div>
         </div>
       </section>
 
-      <section class="view" id="view-chat" data-view="chat">
+      <!-- 約打球 -->
+      <section class="view" id="view-invite" data-view="invite">
         <div class="grid-two">
           <div class="card">
-            <h2>聊天互動</h2>
-            <label>對話對象
-              <select id="chat-peer-select"></select>
+            <h2>發出約球邀約</h2>
+            <label>選擇邀請對象
+              <select id="invite-target-select"></select>
             </label>
-            <div class="actions">
-              <button class="btn-secondary" id="open-chat-room" type="button">開啟聊天室</button>
-            </div>
-            <div id="chat-room-info" class="hint">請先選擇對象。</div>
-            <div id="chat-messages" class="chat-box" aria-live="polite"></div>
-            <form id="chat-form" class="inline-form">
-              <input name="message" required maxlength="200" placeholder="輸入訊息..." />
-              <button class="btn-primary" type="submit">送出</button>
-            </form>
-          </div>
-
-          <div class="card">
-            <h2>約打球</h2>
-            <form id="booking-form" class="stack">
+            <div id="invite-target-card" class="invite-target-preview"></div>
+            <form id="invite-form" class="stack" style="margin-top:0.8rem;">
               <label>日期與時間<input required type="datetime-local" name="dateTime" /></label>
-              <label>球場<input required name="courtName" maxlength="60" /></label>
-              <label>備註<textarea name="note" maxlength="150"></textarea></label>
+              <label>球場名稱<input required name="courtName" maxlength="60" placeholder="例：大佳河濱網球場" /></label>
+              <label>備註<textarea name="note" maxlength="150" placeholder="例：帶球拍，下午 2 點場地門口集合"></textarea></label>
               <div class="actions">
                 <button class="btn-primary" type="submit">送出邀約</button>
               </div>
             </form>
-            <div id="booking-list" class="list"></div>
+          </div>
+          <div class="card">
+            <h2>約球紀錄</h2>
+            <div id="invite-list" class="list"></div>
           </div>
         </div>
       </section>
 
+      <!-- 全台球場 -->
       <section class="view" id="view-courts" data-view="courts">
         <div class="card">
           <h2>全台灣球場地圖與評價</h2>
@@ -254,6 +265,7 @@
         </div>
       </section>
 
+      <!-- 交流區 -->
       <section class="view" id="view-forum" data-view="forum">
         <div class="grid-two">
           <div class="card">
@@ -292,14 +304,16 @@
         </div>
       </section>
 
+      <!-- 架構與資安 -->
       <section class="view" id="view-security" data-view="security">
         <div class="card">
           <h2>可維護性、擴展性與資安設計</h2>
           <ul>
-            <li>模組化前端：`services` 與 `modules` 分層，後續可直接改接後端 API。</li>
+            <li>模組化前端：<code>services</code> 與 <code>modules</code> 分層，後續可直接改接後端 API。</li>
             <li>輸入驗證與文字淨化：避免 XSS，所有使用者內容皆以安全方式輸出。</li>
-            <li>前端限流：聊天室與發文具備基本 rate limit，減少濫用流量。</li>
+            <li>前端限流：約球邀約與發文具備基本 rate limit，減少濫用流量。</li>
             <li>資料抽象層：目前使用 LocalStorage，未來可切換成 REST/GraphQL。</li>
+            <li>後端骨架：Node.js + Express，包含 JWT 驗證、Argon2id 雜湊、Refresh Token 輪換。</li>
             <li>部署建議：搭配 Cloudflare/WAF、後端 JWT、IP rate limit、DDoS 防護。</li>
           </ul>
           <p>

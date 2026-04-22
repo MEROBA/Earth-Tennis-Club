@@ -592,3 +592,237 @@ a:hover {
     min-height: 320px;
   }
 }
+
+/* ── Player Card ── */
+.player-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.player-card {
+  display: flex;
+  gap: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+  background: var(--surface-soft);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.player-card:hover {
+  border-color: rgba(213, 255, 47, 0.4);
+  transform: translateY(-2px);
+}
+
+.player-card.is-self {
+  border-color: rgba(0, 168, 255, 0.5);
+  background: rgba(0, 80, 160, 0.22);
+}
+
+.player-card__photo {
+  flex: 0 0 60px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(163, 192, 235, 0.35);
+  background: rgba(15, 45, 89, 0.8);
+}
+
+.player-card__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.player-card__photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.player-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.player-card__name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.player-card__name {
+  margin: 0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  color: #eaf3ff;
+}
+
+.player-card__ntrp {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid rgba(213, 255, 47, 0.6);
+  color: var(--accent);
+  background: rgba(213, 255, 47, 0.1);
+  border-radius: 999px;
+  padding: 0.1rem 0.52rem;
+}
+
+.player-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.6rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.player-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.player-card__schedule-btn {
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  padding: 0.3rem 0.7rem;
+  align-self: flex-start;
+}
+
+.current-card-wrap {
+  margin-top: 0.8rem;
+}
+
+.current-card-wrap .player-card {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.current-card-wrap .player-card__photo {
+  width: 72px;
+  height: 72px;
+}
+
+/* ── NTRP inline assessment ── */
+.ntrp-section {
+  border: 1px solid rgba(163, 192, 235, 0.22);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: rgba(8, 20, 40, 0.5);
+}
+
+.ntrp-header {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.ntrp-header label {
+  flex: 1;
+  min-width: 120px;
+}
+
+.ntrp-toggle-btn {
+  font-size: 0.82rem;
+  padding: 0.32rem 0.65rem;
+  white-space: nowrap;
+}
+
+.ntrp-questions {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.ntrp-item {
+  display: grid;
+  gap: 0.2rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.ntrp-item__title {
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.ntrp-item__val {
+  text-align: right;
+  font-size: 0.78rem;
+}
+
+.ntrp-result {
+  margin-top: 0.6rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  background: rgba(213, 255, 47, 0.08);
+  border: 1px solid rgba(213, 255, 47, 0.3);
+  color: #e5ff80;
+}
+
+/* ── Match result item ── */
+.match-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.match-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.match-score-value {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.match-score-reason {
+  font-size: 0.82rem;
+}
+
+/* ── Invite / play scheduling ── */
+.invite-target-preview {
+  margin-top: 0.6rem;
+}
+
+.invite-target-preview .player-card {
+  background: rgba(0, 50, 100, 0.28);
+}
+
+.invite-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+@media (max-width: 640px) {
+  .player-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ntrp-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

@@ -1,7 +1,7 @@
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
-function roundToHalf(value) {
-  return Math.round(value * 2) / 2;
+function roundToHalf(v) {
+  return Math.round(v * 2) / 2;
 }
 
 function describeNtrp(ntrp) {
@@ -12,19 +12,17 @@ function describeNtrp(ntrp) {
 }
 
 export function evaluateTennisLevel(answers) {
-  const values = Object.values(answers).map((value) => Number(value || 0));
-  if (!values.length || values.some((value) => value < 1 || value > 7)) {
+  const values = Object.values(answers).map((v) => Number(v || 0));
+  if (!values.length || values.some((v) => v < 1 || v > 7)) {
     throw new Error("問卷分數需介於 1 到 7");
   }
 
-  const avg = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const avg = values.reduce((s, v) => s + v, 0) / values.length;
   const ntrp = clamp(roundToHalf(1.5 + avg * 0.57), 1.5, 7.0);
-  const utr = clamp(Number((0.8 + (avg - 1) * 2.1).toFixed(1)), 1, 16.5);
 
   return {
     averageScore: Number(avg.toFixed(2)),
     ntrp,
-    utr,
     summary: describeNtrp(ntrp),
   };
 }
