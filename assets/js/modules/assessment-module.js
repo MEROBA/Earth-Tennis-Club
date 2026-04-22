@@ -1,6 +1,6 @@
 import { createNode } from "../ui/dom.js";
 
-export function initAssessmentModule({ questionnaireItems, evaluate, onResult, notify }) {
+export function initAssessmentModule({ questionnaireItems, evaluate, getHistory, onResult, notify }) {
   const form = document.querySelector("#assessment-form");
   const submitBtn = document.querySelector("#assessment-submit");
   const resetBtn = document.querySelector("#assessment-reset");
@@ -71,9 +71,30 @@ export function initAssessmentModule({ questionnaireItems, evaluate, onResult, n
     resultBox.innerHTML = "<h3>評估結果</h3><p>尚未計算。</p>";
   });
 
+  function renderHistory() {
+    const history = getHistory ? getHistory() : [];
+    const historyBox = document.querySelector("#assessment-history");
+    if (!historyBox) return;
+    if (!history.length) {
+      historyBox.innerHTML = "<p class='hint'>尚無評估紀錄。</p>";
+      return;
+    }
+    historyBox.replaceChildren(
+      ...history.slice(0, 10).map((item) => {
+        const node = createNode("article", "list-item");
+        node.append(
+          createNode("p", null, `NTRP ${item.ntrp.toFixed(1)} / UTR ${item.utr.toFixed(1)}  ·  平均分 ${item.averageScore}`),
+          createNode("p", "hint", `${item.summary}  ·  ${new Date(item.createdAt).toLocaleDateString("zh-TW")}`)
+        );
+        return node;
+      })
+    );
+  }
+
   return {
     setLatestResult(result) {
       renderResult(result);
+      renderHistory();
     },
   };
 }

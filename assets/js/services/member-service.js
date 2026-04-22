@@ -168,6 +168,22 @@ export function createMemberService(storage) {
       .slice(0, limit);
   }
 
+  function saveAssessment(payload) {
+    const record = {
+      averageScore: payload.averageScore,
+      ntrp: payload.ntrp,
+      utr: payload.utr,
+      summary: payload.summary,
+      createdAt: Date.now(),
+    };
+    storage.update("assessmentHistory", [], (history) => [record, ...history].slice(0, 50));
+    return record;
+  }
+
+  function getAssessmentHistory() {
+    return storage.get("assessmentHistory", []);
+  }
+
   return {
     getMembers,
     saveMember,
@@ -176,5 +192,7 @@ export function createMemberService(storage) {
     getCurrentUser,
     filterMembers,
     findMatches,
+    saveAssessment,
+    getAssessmentHistory,
   };
 }

@@ -68,9 +68,28 @@ export function createChatService(storage) {
     return booking;
   }
 
+  function updateBookingStatus(roomId, bookingId, status) {
+    const VALID = ["proposed", "accepted", "rejected", "cancelled", "completed"];
+    if (!VALID.includes(status)) {
+      throw new Error("無效的邀約狀態");
+    }
+    const rooms = getRooms(storage);
+    if (!rooms[roomId]) {
+      throw new Error("聊天室不存在");
+    }
+    const booking = rooms[roomId].bookings.find((b) => b.id === bookingId);
+    if (!booking) {
+      throw new Error("找不到邀約紀錄");
+    }
+    booking.status = status;
+    setRooms(storage, rooms);
+    return booking;
+  }
+
   return {
     getRoom,
     sendMessage,
     addBooking,
+    updateBookingStatus,
   };
 }

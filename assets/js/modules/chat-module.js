@@ -68,6 +68,14 @@ export function initChatModule({ memberService, chatService, rateLimiter, chatLi
     renderList(messagesBox, messageNodes);
     messagesBox.scrollTop = messagesBox.scrollHeight;
 
+    const statusLabels = {
+      proposed: "待確認",
+      accepted: "已接受",
+      rejected: "已拒絕",
+      cancelled: "已取消",
+      completed: "已完成",
+    };
+
     const bookingNodes = room.bookings
       .slice()
       .reverse()
@@ -75,9 +83,40 @@ export function initChatModule({ memberService, chatService, rateLimiter, chatLi
         const node = createNode("article", "list-item");
         node.append(
           createNode("h4", null, `${formatDateTime(booking.dateTime)}｜${booking.courtName}`),
-          createNode("p", null, `狀態: ${booking.status}`),
+          createNode("p", null, `狀態: ${statusLabels[booking.status] || booking.status}`),
           createNode("p", "hint", booking.note || "無備註")
         );
+
+        if (booking.status === "proposed") {
+          const actions = createNode("div", "actions");
+          const accept = createNode("button", "btn-primary", "接受");
+          accept.type = "button";
+          accept.dataset.bookingId = booking.id;
+          accept.dataset.action = "accepted";
+
+          const reject = createNode("button", "btn-secondary", "拒絕");
+          reject.type = "button";
+          reject.dataset.bookingId = booking.id;
+          reject.dataset.action = "rejected";
+
+          actions.append(accept, reject);
+          node.append(actions);
+        } else if (booking.status === "accepted") {
+          const actions = createNode("div", "actions");
+          const cancel = createNode("button", "btn-secondary", "取消");
+          cancel.type = "button";
+          cancel.dataset.bookingId = booking.id;
+          cancel.dataset.action = "cancelled";
+
+          const complete = createNode("button", "btn-primary", "完成");
+          complete.type = "button";
+          complete.dataset.bookingId = booking.id;
+          complete.dataset.action = "completed";
+
+          actions.append(cancel, complete);
+          node.append(actions);
+        }
+
         return node;
       });
 
@@ -127,6 +166,18 @@ export function initChatModule({ memberService, chatService, rateLimiter, chatLi
     chatService.sendMessage(activeRoomId, currentUser.id, data.message);
     chatForm.reset();
     renderRoom();
+  });
+
+  bookingList.addEventListener("click", (event) => {
+    const btn = event.target.closest("button[data-booking-id]");
+    if (!btn || !activeRoomId) return;
+    try {
+      chatService.updateBookingStatus(activeRoomId, btn.dataset.bookingId, btn.dataset.action);
+      renderRoom();
+      notify("邀約狀態已更新");
+    } catch (error) {
+      notify(error.message);
+    }
   });
 
   bookingForm.addEventListener("submit", (event) => {

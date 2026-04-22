@@ -10,9 +10,11 @@ const categoryText = {
 export function initForumModule({ forumService, memberService, notify, rateLimiter, postLimit }) {
   const form = document.querySelector("#forum-post-form");
   const list = document.querySelector("#forum-posts");
+  const categoryFilter = document.querySelector("#forum-filter-category");
 
   function renderPosts() {
-    const posts = forumService.getPosts();
+    const category = categoryFilter?.value || "all";
+    const posts = forumService.getPosts(category);
     if (!posts.length) {
       list.innerHTML = "<p class='hint'>目前還沒有文章，歡迎發第一篇！</p>";
       return;
@@ -61,6 +63,8 @@ export function initForumModule({ forumService, memberService, notify, rateLimit
 
     renderList(list, nodes);
   }
+
+  categoryFilter?.addEventListener("change", renderPosts);
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();

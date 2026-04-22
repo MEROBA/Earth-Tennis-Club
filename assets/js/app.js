@@ -71,8 +71,10 @@ function onCurrentUserChange() {
 const assessmentModule = initAssessmentModule({
   questionnaireItems: QUESTIONNAIRE_ITEMS,
   evaluate: evaluateTennisLevel,
+  getHistory: () => memberService.getAssessmentHistory(),
   onResult(result) {
     store.setState({ latestAssessment: result });
+    memberService.saveAssessment(result);
     membersModule?.applyAssessment(result);
   },
   notify,

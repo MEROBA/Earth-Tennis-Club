@@ -53,18 +53,27 @@ export function createCourtService(storage) {
 
   function addReview(courtId, payload) {
     const reviewsByCourt = getReviewBucket(storage);
+    const author = sanitizeText(payload.author || "匿名球友", 30);
+    const existing = (reviewsByCourt[courtId] || []).find((r) => r.author === author);
+
+    if (existing) {
+      existing.rating = Number(payload.rating);
+      existing.comment = sanitizeText(payload.comment, 180);
+      existing.updatedAt = Date.now();
+      setReviewBucket(storage, reviewsByCourt);
+      return existing;
+    }
+
     const review = {
       id: `review_${crypto.randomUUID().slice(0, 8)}`,
       rating: Number(payload.rating),
       comment: sanitizeText(payload.comment, 180),
-      author: sanitizeText(payload.author || "匿名球友", 30),
+      author,
       createdAt: Date.now(),
     };
 
-    const current = reviewsByCourt[courtId] || [];
-    reviewsByCourt[courtId] = [review, ...current];
+    reviewsByCourt[courtId] = [review, ...(reviewsByCourt[courtId] || [])];
     setReviewBucket(storage, reviewsByCourt);
-
     return review;
   }
 

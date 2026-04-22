@@ -1,9 +1,10 @@
 import { sanitizeText } from "./security-service.js";
 
 export function createForumService(storage) {
-  function getPosts() {
+  function getPosts(category = "all") {
     return storage
       .get("forumPosts", [])
+      .filter((post) => category === "all" || post.category === category)
       .sort((a, b) => b.createdAt - a.createdAt)
       .map((post) => ({
         ...post,

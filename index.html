@@ -87,6 +87,10 @@
           <h3>評估結果</h3>
           <p>尚未計算。</p>
         </div>
+        <div class="card">
+          <h3>評估歷史紀錄</h3>
+          <div id="assessment-history" class="list"><p class="hint">尚無評估紀錄。</p></div>
+        </div>
       </section>
 
       <section class="view" id="view-members" data-view="members">
@@ -272,6 +276,17 @@
           </div>
           <div class="card">
             <h2>文章列表</h2>
+            <div class="inline-filters">
+              <label>分類篩選
+                <select id="forum-filter-category">
+                  <option value="all">全部</option>
+                  <option value="strategy">戰術討論</option>
+                  <option value="equipment">裝備心得</option>
+                  <option value="training">訓練分享</option>
+                  <option value="general">閒聊</option>
+                </select>
+              </label>
+            </div>
             <div id="forum-posts" class="list"></div>
           </div>
         </div>
