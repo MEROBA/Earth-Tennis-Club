@@ -73,3 +73,21 @@ SECURITY.md                      # 資安設計與上線建議
 
 已實作前端層保護（輸入淨化、欄位驗證、基本限流、CSP），完整細節請看 [SECURITY.md](./SECURITY.md)。
 
+## 7. 後端規格（API + PostgreSQL + JWT）
+
+已新增完整後端設計包在 `backend/`：
+
+- `backend/api/openapi.yaml`：完整 REST API 規格（Auth / Members / Matching / Chat / Courts / Forum）
+- `backend/db/schema.sql`：PostgreSQL schema（會員、討論串、球場評價、聊天室、邀約、refresh session）
+- `backend/docs/JWT_FLOW.md`：Access/Refresh token 旋轉、重放偵測與登出撤銷流程
+- `backend/docs/ARCHITECTURE.md`：架構決策與擴展建議
+
+推薦正式環境方案：
+
+- `PostgreSQL` 做主資料庫
+- `Redis` 做 rate limit、token 安全控制與快取
+- `WAF/CDN` 在 API 前方做 DDoS 與惡意流量防護
+
+## 8. 開發規格文件（SDD）
+
+- `SDD.md`：目前版本完整開發規格書（需求、架構、資料模型、API/JWT、安全與測試策略）

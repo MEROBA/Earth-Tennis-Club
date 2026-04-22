@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
     <link
@@ -26,18 +26,40 @@
     <link rel="stylesheet" href="./assets/css/styles.css" />
   </head>
   <body>
-    <div class="aurora aurora-left" aria-hidden="true"></div>
-    <div class="aurora aurora-right" aria-hidden="true"></div>
+    <div class="court-lines" aria-hidden="true"></div>
+    <div class="glow-orb glow-left" aria-hidden="true"></div>
+    <div class="glow-orb glow-right" aria-hidden="true"></div>
 
     <header class="site-header">
-      <div>
+      <div class="hero-copy">
         <p class="eyebrow">Tennis Social Platform</p>
-        <h1>Earth Tennis Club</h1>
+        <h1><span>Earth</span> Tennis Club</h1>
         <p class="subtitle">
           網球等級評估、球友配對、球場資訊與互動社群的一站式前端平台
         </p>
+        <div class="hero-tags">
+          <span>UTR + NTRP</span>
+          <span>Find Tennis Partners</span>
+          <span>Taiwan Court Map</span>
+        </div>
       </div>
-      <div class="status-chip" id="api-mode-chip" aria-live="polite">Mock Mode</div>
+      <aside class="hero-panel">
+        <div class="status-chip" id="api-mode-chip" aria-live="polite">Mock Mode</div>
+        <div class="hero-metrics">
+          <article class="metric">
+            <p class="metric-value">22</p>
+            <p class="metric-label">全台縣市覆蓋</p>
+          </article>
+          <article class="metric">
+            <p class="metric-value">2 種</p>
+            <p class="metric-label">等級系統評估</p>
+          </article>
+          <article class="metric">
+            <p class="metric-value">1 站式</p>
+            <p class="metric-label">配對 + 聊天 + 約球</p>
+          </article>
+        </div>
+      </aside>
     </header>
 
     <nav class="tab-nav" aria-label="主功能分頁">
@@ -50,7 +72,7 @@
       <button class="tab-button" data-view="security">架構與資安</button>
     </nav>
 
-    <main>
+    <main class="app-main">
       <section class="view is-active" id="view-assessment" data-view="assessment">
         <div class="card">
           <h2>自我評價問卷（UTR + NTRP）</h2>

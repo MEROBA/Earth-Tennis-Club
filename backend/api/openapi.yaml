@@ -1,0 +1,1104 @@
+openapi: 3.0.3
+info:
+  title: Earth Tennis Club API
+  version: 1.0.0
+  description: |
+    API contract for Earth Tennis Club backend.
+    Covers auth, members, matching, chat, courts, reviews, and forum.
+servers:
+  - url: https://api.earth-tennis.club
+    description: Production
+  - url: http://localhost:4000
+    description: Local
+security:
+  - bearerAuth: []
+tags:
+  - name: Health
+  - name: Auth
+  - name: Members
+  - name: Matching
+  - name: Chat
+  - name: Courts
+  - name: Forum
+paths:
+  /v1/health:
+    get:
+      tags: [Health]
+      security: []
+      summary: Health check
+      responses:
+        '200':
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /v1/auth/register:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Register account and profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Registered
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: HttpOnly refresh token cookie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/auth/login:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Login by email/password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Logged in
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: HttpOnly refresh token cookie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/auth/refresh:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Rotate refresh token and issue new access token
+      responses:
+        '200':
+          description: Refreshed
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: New HttpOnly refresh token cookie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout current session
+      responses:
+        '204':
+          description: Logged out
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/members/me:
+    get:
+      tags: [Members]
+      summary: Get current member profile
+      responses:
+        '200':
+          description: Current profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      tags: [Members]
+      summary: Update current member profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMemberProfileRequest'
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/members:
+    get:
+      tags: [Members]
+      summary: List public members for matching
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+          description: Filter by city
+        - in: query
+          name: minNtrp
+          schema:
+            type: number
+            format: float
+            minimum: 1.5
+            maximum: 7.0
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Member list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberListResponse'
+
+  /v1/matches/recommendations:
+    get:
+      tags: [Matching]
+      summary: Get match recommendations for current user
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 30
+            default: 8
+      responses:
+        '200':
+          description: Match recommendations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MatchRecommendation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/chat/rooms:
+    get:
+      tags: [Chat]
+      summary: List rooms for current user
+      responses:
+        '200':
+          description: Room list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChatRoom'
+    post:
+      tags: [Chat]
+      summary: Create direct room with target user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetUserId]
+              properties:
+                targetUserId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Room created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoom'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /v1/chat/rooms/{roomId}/messages:
+    get:
+      tags: [Chat]
+      summary: List room messages
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+        - in: query
+          name: cursor
+          schema:
+            type: string
+            format: date-time
+          description: Fetch messages older than this timestamp
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 30
+      responses:
+        '200':
+          description: Messages list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChatMessage'
+                  nextCursor:
+                    type: string
+                    format: date-time
+                    nullable: true
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Chat]
+      summary: Send message in room
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+      responses:
+        '201':
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v1/chat/rooms/{roomId}/invites:
+    get:
+      tags: [Chat]
+      summary: List play invites for room
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      responses:
+        '200':
+          description: Invite list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlayInvite'
+    post:
+      tags: [Chat]
+      summary: Create play invite
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlayInviteRequest'
+      responses:
+        '201':
+          description: Invite created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayInvite'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /v1/courts:
+    get:
+      tags: [Courts]
+      security: []
+      summary: List courts
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+        - in: query
+          name: surface
+          schema:
+            $ref: '#/components/schemas/CourtSurface'
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Courts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Court'
+                  page:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  total:
+                    type: integer
+
+  /v1/courts/{courtId}/reviews:
+    get:
+      tags: [Courts]
+      security: []
+      summary: List court reviews
+      parameters:
+        - $ref: '#/components/parameters/CourtId'
+      responses:
+        '200':
+          description: Review list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CourtReview'
+    post:
+      tags: [Courts]
+      summary: Create or update own review for court
+      parameters:
+        - $ref: '#/components/parameters/CourtId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourtReviewRequest'
+      responses:
+        '201':
+          description: Review upserted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourtReview'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/forum/posts:
+    get:
+      tags: [Forum]
+      security: []
+      summary: List forum posts
+      parameters:
+        - in: query
+          name: category
+          schema:
+            $ref: '#/components/schemas/ForumCategory'
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Forum posts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ForumPost'
+                  page:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  total:
+                    type: integer
+    post:
+      tags: [Forum]
+      summary: Create forum post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateForumPostRequest'
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumPost'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/forum/posts/{postId}/comments:
+    get:
+      tags: [Forum]
+      security: []
+      summary: List comments for post
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      responses:
+        '200':
+          description: Comment list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ForumComment'
+    post:
+      tags: [Forum]
+      summary: Create comment
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateForumCommentRequest'
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumComment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    RoomId:
+      in: path
+      name: roomId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    CourtId:
+      in: path
+      name: courtId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PostId:
+      in: path
+      name: postId
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Invalid input
+        details:
+          nullable: true
+      required: [code, message]
+
+    GenderType:
+      type: string
+      enum: [female, male, non_binary, prefer_not_to_say]
+
+    CourtSurface:
+      type: string
+      enum: [hard, clay, grass, synthetic]
+
+    ForumCategory:
+      type: string
+      enum: [strategy, equipment, training, general]
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - displayName
+        - city
+        - gender
+        - age
+        - yearsPlaying
+        - preferredSurface
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+          maxLength: 72
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 30
+        city:
+          type: string
+          maxLength: 20
+        gender:
+          $ref: '#/components/schemas/GenderType'
+        age:
+          type: integer
+          minimum: 10
+          maximum: 90
+        yearsPlaying:
+          type: integer
+          minimum: 0
+          maximum: 70
+        preferredSurface:
+          $ref: '#/components/schemas/CourtSurface'
+        availabilityText:
+          type: string
+          maxLength: 80
+        utr:
+          type: number
+          minimum: 1
+          maximum: 16.5
+          default: 1
+        ntrp:
+          type: number
+          minimum: 1.5
+          maximum: 7
+          default: 1.5
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+          maxLength: 72
+
+    AuthTokenResponse:
+      type: object
+      required: [accessToken, tokenType, expiresIn, user]
+      properties:
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          description: seconds
+          example: 900
+        user:
+          $ref: '#/components/schemas/MemberProfile'
+
+    MemberProfile:
+      type: object
+      required:
+        - userId
+        - email
+        - role
+        - displayName
+        - city
+        - gender
+        - age
+        - yearsPlaying
+        - preferredSurface
+        - utr
+        - ntrp
+      properties:
+        userId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [user, moderator, admin]
+        displayName:
+          type: string
+        city:
+          type: string
+        gender:
+          $ref: '#/components/schemas/GenderType'
+        age:
+          type: integer
+        yearsPlaying:
+          type: integer
+        preferredSurface:
+          $ref: '#/components/schemas/CourtSurface'
+        availabilityText:
+          type: string
+          nullable: true
+        utr:
+          type: number
+        ntrp:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UpdateMemberProfileRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 30
+        city:
+          type: string
+          maxLength: 20
+        gender:
+          $ref: '#/components/schemas/GenderType'
+        age:
+          type: integer
+          minimum: 10
+          maximum: 90
+        yearsPlaying:
+          type: integer
+          minimum: 0
+          maximum: 70
+        preferredSurface:
+          $ref: '#/components/schemas/CourtSurface'
+        availabilityText:
+          type: string
+          maxLength: 80
+        utr:
+          type: number
+          minimum: 1
+          maximum: 16.5
+        ntrp:
+          type: number
+          minimum: 1.5
+          maximum: 7
+
+    MemberListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberProfilePublic'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+    MemberProfilePublic:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        city:
+          type: string
+        age:
+          type: integer
+        yearsPlaying:
+          type: integer
+        preferredSurface:
+          $ref: '#/components/schemas/CourtSurface'
+        availabilityText:
+          type: string
+          nullable: true
+        utr:
+          type: number
+        ntrp:
+          type: number
+
+    MatchRecommendation:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/MemberProfilePublic'
+        score:
+          type: number
+          example: 84.6
+        reason:
+          type: string
+          example: Same city, close level, similar availability
+
+    ChatRoom:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [direct, group]
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberProfilePublic'
+        lastMessageAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        roomId:
+          type: string
+          format: uuid
+        senderUserId:
+          type: string
+          format: uuid
+        message:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CreatePlayInviteRequest:
+      type: object
+      required: [inviteeUserId, dateTime, courtName]
+      properties:
+        inviteeUserId:
+          type: string
+          format: uuid
+        courtId:
+          type: string
+          format: uuid
+          nullable: true
+        courtName:
+          type: string
+          maxLength: 120
+        dateTime:
+          type: string
+          format: date-time
+        note:
+          type: string
+          maxLength: 200
+
+    PlayInvite:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        roomId:
+          type: string
+          format: uuid
+          nullable: true
+        proposerUserId:
+          type: string
+          format: uuid
+        inviteeUserId:
+          type: string
+          format: uuid
+        courtId:
+          type: string
+          format: uuid
+          nullable: true
+        courtName:
+          type: string
+        dateTime:
+          type: string
+          format: date-time
+        note:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [proposed, accepted, rejected, cancelled, completed]
+        createdAt:
+          type: string
+          format: date-time
+
+    Court:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+          nullable: true
+        address:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+        surface:
+          $ref: '#/components/schemas/CourtSurface'
+        courtCount:
+          type: integer
+        hasLights:
+          type: boolean
+        feeNote:
+          type: string
+          nullable: true
+        rating:
+          type: number
+          nullable: true
+        reviewCount:
+          type: integer
+
+    CreateCourtReviewRequest:
+      type: object
+      required: [rating, comment]
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          minLength: 1
+          maxLength: 180
+
+    CourtReview:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        courtId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        authorName:
+          type: string
+        rating:
+          type: integer
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateForumPostRequest:
+      type: object
+      required: [title, category, content]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 70
+        category:
+          $ref: '#/components/schemas/ForumCategory'
+        content:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    ForumPost:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        authorName:
+          type: string
+        title:
+          type: string
+        category:
+          $ref: '#/components/schemas/ForumCategory'
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateForumCommentRequest:
+      type: object
+      required: [content]
+      properties:
+        parentCommentId:
+          type: string
+          format: uuid
+          nullable: true
+        content:
+          type: string
+          minLength: 1
+          maxLength: 220
+
+    ForumComment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        postId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        parentCommentId:
+          type: string
+          format: uuid
+          nullable: true
+        authorName:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
