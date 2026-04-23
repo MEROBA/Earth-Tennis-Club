@@ -182,15 +182,134 @@
 
       <!-- 球友推薦 -->
       <section class="view" id="view-matching" data-view="matching">
+
+        <!-- 搜尋卡：智慧配對 + 手動篩選 -->
         <div class="card">
-          <h2>球友智慧推薦</h2>
-          <p class="hint">系統依據 NTRP 等級、球齡、地區與可打球時段，自動找出最適合的球友。</p>
-          <div class="actions">
-            <button id="run-matching" class="btn-primary" type="button">一鍵找球友</button>
+          <div class="matching-mode-tabs" role="tablist">
+            <button class="matching-mode-btn is-active" data-mode="smart" type="button">🤖 智慧配對</button>
+            <button class="matching-mode-btn" data-mode="manual" type="button">🔍 手動篩選</button>
           </div>
+
+          <!-- 智慧配對面板 -->
+          <div id="matching-smart-panel" class="matching-panel">
+            <p class="hint" style="margin-bottom:0.7rem;">系統依據 NTRP 等級、球齡、地區與可打球時段，自動找出最適合的球友。</p>
+            <div class="actions">
+              <button id="run-matching" class="btn-primary" type="button">⚡ 一鍵找球友</button>
+            </div>
+          </div>
+
+          <!-- 手動篩選面板 -->
+          <div id="matching-manual-panel" class="matching-panel" style="display:none;">
+            <form id="matching-filter-form" class="matching-filter-grid">
+              <label>性別
+                <select name="gender">
+                  <option value="all">不限</option>
+                  <option value="male">男</option>
+                  <option value="female">女</option>
+                  <option value="non_binary">非二元</option>
+                </select>
+              </label>
+              <label>地區<select name="city" id="matching-city-filter"></select></label>
+              <label>最低 NTRP
+                <select name="minNtrp">
+                  <option value="0">不限</option>
+                  <option value="2.0">2.0+</option>
+                  <option value="2.5">2.5+</option>
+                  <option value="3.0">3.0+</option>
+                  <option value="3.5">3.5+</option>
+                  <option value="4.0">4.0+</option>
+                  <option value="4.5">4.5+</option>
+                </select>
+              </label>
+              <label>最高 NTRP
+                <select name="maxNtrp">
+                  <option value="7">不限</option>
+                  <option value="3.0">≤ 3.0</option>
+                  <option value="3.5">≤ 3.5</option>
+                  <option value="4.0">≤ 4.0</option>
+                  <option value="4.5">≤ 4.5</option>
+                  <option value="5.0">≤ 5.0</option>
+                </select>
+              </label>
+              <label>最小年齡<input name="minAge" type="number" min="10" max="90" placeholder="不限" /></label>
+              <label>最大年齡<input name="maxAge" type="number" min="10" max="90" placeholder="不限" /></label>
+              <label>最少球齡（年）<input name="minYears" type="number" min="0" max="70" placeholder="不限" /></label>
+              <label>最多球齡（年）<input name="maxYears" type="number" min="0" max="70" placeholder="不限" /></label>
+              <label>慣用場地
+                <select name="surface">
+                  <option value="all">不限</option>
+                  <option value="hard">硬地</option>
+                  <option value="clay">紅土</option>
+                  <option value="grass">草地</option>
+                  <option value="synthetic">合成地</option>
+                </select>
+              </label>
+              <label>打法風格
+                <select name="playStyle">
+                  <option value="all">不限</option>
+                  <option value="baseline">底線型</option>
+                  <option value="serve_volley">上網型</option>
+                  <option value="all_court">全場型</option>
+                  <option value="defensive">防守型</option>
+                  <option value="aggressive">進攻型</option>
+                </select>
+              </label>
+            </form>
+            <div class="actions" style="margin-top:0.8rem;">
+              <button id="run-manual-filter" class="btn-primary" type="button">🔍 搜尋球友</button>
+              <button id="reset-manual-filter" class="btn-secondary" type="button">重置</button>
+            </div>
+          </div>
+
           <p id="matching-empty" class="hint" style="margin-top:0.6rem;"></p>
           <div id="matching-results" class="player-card-grid"></div>
         </div>
+
+        <!-- 正在尋找 -->
+        <div class="card">
+          <div class="looking-for-header">
+            <div>
+              <h2 style="margin:0;">📢 正在尋找</h2>
+              <p class="hint" style="margin:0.3rem 0 0;">主動發起尋找，有意願的球友可報名，確認後自動建立對戰紀錄。</p>
+            </div>
+            <button id="create-lf-btn" class="btn-primary" type="button">+ 發起尋找</button>
+          </div>
+
+          <div id="lf-create-wrap" style="display:none; margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;">
+            <h3 style="margin-bottom:0.8rem;">發起新尋找</h3>
+            <form id="lf-create-form" class="stack">
+              <label>說明備註
+                <textarea name="note" maxlength="200" rows="2"
+                  placeholder="例：想找平日晚上可以打一小時的夥伴，台北市附近的球友歡迎！"></textarea>
+              </label>
+              <div class="looking-for-criteria-grid">
+                <label>希望性別
+                  <select name="gender">
+                    <option value="all">不限</option>
+                    <option value="male">男</option>
+                    <option value="female">女</option>
+                    <option value="non_binary">非二元</option>
+                  </select>
+                </label>
+                <label>希望地區<select name="city" id="lf-city-select"></select></label>
+                <label>最低 NTRP<input name="minNtrp" type="number" step="0.5" min="1.5" max="7" placeholder="不限" /></label>
+                <label>最高 NTRP<input name="maxNtrp" type="number" step="0.5" min="1.5" max="7" placeholder="不限" /></label>
+                <label>最小年齡<input name="minAge" type="number" min="10" max="90" placeholder="不限" /></label>
+                <label>最大年齡<input name="maxAge" type="number" min="10" max="90" placeholder="不限" /></label>
+                <label>最少球齡（年）<input name="minYears" type="number" min="0" max="70" placeholder="不限" /></label>
+                <label>最多球齡（年）<input name="maxYears" type="number" min="0" max="70" placeholder="不限" /></label>
+              </div>
+              <label>報名截止時間<input required name="deadline" type="datetime-local" /></label>
+              <div class="actions">
+                <button class="btn-primary" type="submit">🚀 發布尋找</button>
+                <button class="btn-secondary" id="lf-cancel-btn" type="button">取消</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="lf-list" style="margin-top:0.8rem;"></div>
+        </div>
+
       </section>
 
       <!-- 約打球 -->

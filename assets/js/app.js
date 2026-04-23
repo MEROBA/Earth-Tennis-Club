@@ -13,6 +13,8 @@ import { createMemberService } from "./services/member-service.js";
 import { createInviteService } from "./services/invite-service.js";
 import { createEquipmentService } from "./services/equipment-service.js";
 import { createTournamentService } from "./services/tournament-service.js";
+import { createMatchRecordService } from "./services/match-record-service.js";
+import { createLookingForService } from "./services/looking-for-service.js";
 import { createRateLimiter } from "./services/security-service.js";
 import { createStorageService } from "./services/storage-service.js";
 import { qsa } from "./ui/dom.js";
@@ -21,15 +23,17 @@ const storage = createStorageService(APP_CONFIG.storageNamespace);
 const api = createApiService(APP_CONFIG.api);
 const rateLimiter = createRateLimiter(storage);
 
-const memberService = createMemberService(storage, api);
-const courtService = createCourtService(storage, api);
-const forumService = createForumService(storage, api);
-const inviteService = createInviteService(storage);
-const equipmentService = createEquipmentService(storage);
-const tournamentService = createTournamentService();
+const memberService       = createMemberService(storage, api);
+const courtService        = createCourtService(storage, api);
+const forumService        = createForumService(storage, api);
+const inviteService       = createInviteService(storage);
+const equipmentService    = createEquipmentService(storage);
+const tournamentService   = createTournamentService();
+const matchRecordService  = createMatchRecordService(storage);
+const lookingForService   = createLookingForService(storage, matchRecordService);
 
 const toast = document.querySelector("#toast");
-const chip = document.querySelector("#api-mode-chip");
+const chip  = document.querySelector("#api-mode-chip");
 chip.textContent = APP_CONFIG.api.mode === "mock" ? "Mock Mode" : "API Mode";
 
 let toastTimer;
@@ -42,7 +46,7 @@ function notify(message) {
 
 function initTabs() {
   const buttons = qsa(".tab-button");
-  const views = qsa(".view");
+  const views   = qsa(".view");
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const target = btn.dataset.view;
@@ -66,6 +70,7 @@ function onCurrentUserChange() {
 
 const membersModule = initMembersModule({
   memberService,
+  matchRecordService,
   cities: TAIWAN_CITIES,
   notify,
   onCurrentUserChange,
@@ -73,8 +78,9 @@ const membersModule = initMembersModule({
 
 matchingModule = initMatchingModule({
   memberService,
+  lookingForService,
+  cities: TAIWAN_CITIES,
   onScheduleRequest(member) {
-    // Switch to invite tab and pre-select this member
     const inviteTabBtn = document.querySelector('[data-view="invite"]');
     inviteTabBtn?.click();
     inviteModule?.prefillTarget(member);

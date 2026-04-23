@@ -110,7 +110,7 @@ export function buildPlayerCard(member, { isCurrentUser = false, onSchedule = nu
   return card;
 }
 
-export function initMembersModule({ memberService, cities, notify, onCurrentUserChange }) {
+export function initMembersModule({ memberService, matchRecordService, cities, notify, onCurrentUserChange }) {
   /* ── 球員詳情 Overlay ── */
   const memberOverlayEl   = document.querySelector("#member-detail-overlay");
   const memberOverlayBack = document.querySelector("#member-overlay-back");
@@ -120,9 +120,91 @@ export function initMembersModule({ memberService, cities, notify, onCurrentUser
   function openMemberDetail(member) {
     memberOverlayTitle.textContent = member.name;
     memberOverlayBody.innerHTML = memberDetailHTML(member);
+
+    /* Wire score-recording buttons */
+    memberOverlayBody.querySelectorAll("[data-score-btn]").forEach((btn) => {
+      btn.addEventListener("click", () => showScoreForm(member, btn.dataset.scoreBtn));
+    });
+
     memberOverlayEl.classList.add("is-open");
     memberOverlayEl.scrollTop = 0;
     document.body.style.overflow = "hidden";
+  }
+
+  function showScoreForm(member, recordId) {
+    const record = matchRecordService?.getRecordById(recordId);
+    if (!record) return;
+    const isP1 = record.player1Id === member.id;
+    const opponentName = isP1 ? record.player2Name : record.player1Name;
+
+    const container = memberOverlayBody.querySelector(`[data-score-form-for="${recordId}"]`);
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="score-form">
+        <p style="font-weight:600;margin-bottom:0.6rem;">記錄比分 vs ${escHtml(opponentName)}</p>
+        <div class="set-rows" id="set-rows-${recordId}">
+          ${[1, 2, 3].map((n) => `
+            <div class="set-row">
+              <span class="set-row__label">第 ${n} 局</span>
+              <input class="set-input" type="number" data-set="${n - 1}" data-side="p1" min="0" max="99" placeholder="${escHtml(member.name)}" />
+              <span class="set-row__sep">:</span>
+              <input class="set-input" type="number" data-set="${n - 1}" data-side="p2" min="0" max="99" placeholder="${escHtml(opponentName)}" />
+            </div>
+          `).join("")}
+        </div>
+        <button type="button" class="btn-secondary add-set-btn" data-for="${recordId}" style="font-size:0.78rem;margin-top:0.4rem;">+ 加局</button>
+        <div class="score-form__winner" style="margin-top:0.7rem;">
+          <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;">勝者</p>
+          <label style="margin-right:0.8rem;"><input type="radio" name="winner-${recordId}" value="self" /> ${escHtml(member.name)}（我）</label>
+          <label style="margin-right:0.8rem;"><input type="radio" name="winner-${recordId}" value="opponent" /> ${escHtml(opponentName)}</label>
+          <label><input type="radio" name="winner-${recordId}" value="draw" /> 平局</label>
+        </div>
+        <div class="actions" style="margin-top:0.7rem;">
+          <button type="button" class="btn-primary confirm-score-btn" data-record="${recordId}" data-is-p1="${isP1}">✓ 確認比分</button>
+          <button type="button" class="btn-secondary cancel-score-btn">取消</button>
+        </div>
+      </div>
+    `;
+
+    container.querySelector(".add-set-btn").addEventListener("click", () => {
+      const rows = container.querySelectorAll(".set-row");
+      const n = rows.length + 1;
+      const row = document.createElement("div");
+      row.className = "set-row";
+      row.innerHTML = `
+        <span class="set-row__label">第 ${n} 局</span>
+        <input class="set-input" type="number" data-set="${n - 1}" data-side="p1" min="0" max="99" placeholder="${escHtml(member.name)}" />
+        <span class="set-row__sep">:</span>
+        <input class="set-input" type="number" data-set="${n - 1}" data-side="p2" min="0" max="99" placeholder="${escHtml(opponentName)}" />
+      `;
+      container.querySelector(".set-rows").append(row);
+    });
+
+    container.querySelector(".cancel-score-btn").addEventListener("click", () => {
+      container.innerHTML = "";
+    });
+
+    container.querySelector(".confirm-score-btn").addEventListener("click", (e) => {
+      const rid   = e.currentTarget.dataset.record;
+      const selfIsP1 = e.currentTarget.dataset.isP1 === "true";
+      const rows  = container.querySelectorAll(".set-row");
+      const sets  = [];
+      rows.forEach((row) => {
+        const p1v = Number(row.querySelector("[data-side='p1']")?.value || 0);
+        const p2v = Number(row.querySelector("[data-side='p2']")?.value || 0);
+        if (p1v > 0 || p2v > 0) sets.push({ p1: p1v, p2: p2v });
+      });
+      const winnerRadio = container.querySelector(`[name="winner-${rid}"]:checked`);
+      if (!winnerRadio) { notify("請選擇勝者"); return; }
+      let winner;
+      if (winnerRadio.value === "self")     winner = selfIsP1 ? "p1" : "p2";
+      else if (winnerRadio.value === "opponent") winner = selfIsP1 ? "p2" : "p1";
+      else winner = "draw";
+      matchRecordService.updateRecord(rid, { sets, winner, status: "completed" });
+      notify("比分已記錄！");
+      openMemberDetail(member);
+    });
   }
 
   function closeMemberDetail() {
@@ -211,8 +293,55 @@ export function initMembersModule({ memberService, cities, notify, onCurrentUser
             ${ntrpDescription(Number(m.ntrp))}
           </p>
         </div>
+
+        <!-- 對戰紀錄 -->
+        <div class="card">
+          <h3 style="margin-bottom:0.8rem;">⚔️ 對戰紀錄</h3>
+          ${matchRecordsHTML(m)}
+        </div>
       </div>
     `;
+  }
+
+  function matchRecordsHTML(m) {
+    const records = matchRecordService?.getRecordsForMember(m.id) ?? [];
+    if (!records.length) {
+      return `<p class="hint" style="text-align:center;padding:0.8rem;">尚無對戰紀錄</p>`;
+    }
+    const currentId = memberService.getCurrentUserId();
+    return records.map((r) => {
+      const isP1 = r.player1Id === m.id;
+      const opponentName = isP1 ? r.player2Name : r.player1Name;
+      const opponentId   = isP1 ? r.player2Id   : r.player1Id;
+      const didWin = r.winner === (isP1 ? "p1" : "p2");
+      const isDraw = r.winner === "draw";
+      const setsStr = r.sets.map((s) => `${s.p1}–${s.p2}`).join("  ");
+      const canRecord = r.status === "scheduled" &&
+        (currentId === m.id || currentId === opponentId);
+
+      let badge;
+      if (r.status === "scheduled") badge = `<span class="badge-upcoming">待對戰</span>`;
+      else if (isDraw)              badge = `<span class="badge">平局</span>`;
+      else if (didWin)              badge = `<span class="badge-live">勝</span>`;
+      else                         badge = `<span class="badge-completed">負</span>`;
+
+      return `
+        <div class="match-record-item">
+          <div class="match-record-header">
+            ${badge}
+            <span class="match-record-opponent">vs <strong>${escHtml(opponentName)}</strong></span>
+            <span class="match-record-date">${r.date}</span>
+          </div>
+          ${setsStr ? `<div class="match-record-sets">${setsStr}</div>` : ""}
+          ${r.venue ? `<div class="match-record-venue">🏟️ ${escHtml(r.venue)}</div>` : ""}
+          ${canRecord ? `
+            <button class="btn-secondary" data-score-btn="${r.id}"
+                    style="margin-top:0.5rem;font-size:0.8rem;" type="button">✏️ 記錄比分</button>
+            <div data-score-form-for="${r.id}"></div>
+          ` : ""}
+        </div>
+      `;
+    }).join("");
   }
 
   function ntrpLevelLabel(n) {
