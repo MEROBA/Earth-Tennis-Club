@@ -1,16 +1,14 @@
 import { EQUIPMENT_CATEGORIES } from "../data/equipment.js";
 import { qs } from "../ui/dom.js";
 
-/**
- * 初始化「運動裝備」頁面模組。
- */
 export function initEquipmentModule({ equipmentService, memberService, notify }) {
   /* ── DOM 參考 ── */
   const categoryTabsEl = qs("#eq-category-tabs");
   const gearGridEl     = qs("#eq-gear-grid");
-  const gearListView   = qs("#eq-list-view");
-  const gearDetailView = qs("#eq-detail-view");
-  const backBtn        = qs("#eq-back-btn");
+  const overlayEl      = qs("#eq-detail-overlay");
+  const overlayBack    = qs("#eq-overlay-back");
+  const overlayTitle   = qs("#eq-overlay-title");
+  const overlayBody    = qs("#eq-overlay-body");
 
   /* ── 狀態 ── */
   let currentCategory = "all";
@@ -71,7 +69,7 @@ export function initEquipmentModule({ equipmentService, memberService, notify })
           <div class="gear-card__body">
             <p class="gear-card__category">${categoryLabel(gear.category)}</p>
             <h3 class="gear-card__name">${gear.brand} ${gear.name}</h3>
-            <p class="gear-card__brand">${gear.tagline}</p>
+            <p class="gear-card__tagline">${gear.tagline}</p>
             <div class="gear-card__rating-row">
               ${starsHTML(avgRating, count)}
             </div>
@@ -93,51 +91,53 @@ export function initEquipmentModule({ equipmentService, memberService, notify })
     return map[cat] ?? cat;
   }
 
-  /* ─────────────────── 詳情頁 ─────────────────── */
+  /* ─────────────────── 詳情頁 Overlay ─────────────────── */
   function openDetail(gearId) {
     const gear = equipmentService.getEquipmentById(gearId);
     if (!gear) return;
 
-    currentGearId = gearId;
+    currentGearId  = gearId;
     selectedRating = 0;
 
-    gearListView.classList.remove("is-active");
-    gearDetailView.classList.add("is-open");
+    overlayTitle.textContent = `${gear.brand} ${gear.name}`;
+    overlayBody.innerHTML = `
+      <div class="overlay-two-col">
+        <div class="overlay-left">
+          <div class="gear-detail-hero" style="background: ${gear.gradient};">
+            <span>${gear.emoji}</span>
+          </div>
+          <div class="gear-detail-meta-pills">
+            <span class="badge">${categoryLabel(gear.category)}</span>
+            <span class="badge">${gear.brand}</span>
+            ${gear.price ? `<span class="badge gear-price-badge">${gear.price}</span>` : ""}
+          </div>
+          <h2 class="gear-detail-name">${gear.brand} ${gear.name}</h2>
+          <p class="gear-detail-tagline">${gear.tagline}</p>
+          <p class="gear-detail-desc">${gear.description}</p>
+          <dl class="gear-spec-grid">
+            ${gear.specs.map((s) => `
+              <div class="gear-spec-item">
+                <dt>${s.label}</dt>
+                <dd>${s.value}</dd>
+              </div>
+            `).join("")}
+          </dl>
+        </div>
+        <div class="overlay-right" id="eq-review-section"></div>
+      </div>
+    `;
 
-    renderDetail(gear);
     renderReviews(gear);
+    overlayEl.classList.add("is-open");
+    overlayEl.scrollTop = 0;
+    document.body.style.overflow = "hidden";
   }
 
   function closeDetail() {
-    gearDetailView.classList.remove("is-open");
-    gearListView.classList.add("is-active");
-    currentGearId = null;
+    overlayEl.classList.remove("is-open");
+    document.body.style.overflow = "";
+    currentGearId  = null;
     selectedRating = 0;
-  }
-
-  function renderDetail(gear) {
-    const detailHeader = qs("#eq-detail-header");
-    detailHeader.innerHTML = `
-      <div class="gear-detail-img" style="background: ${gear.gradient};">
-        <span>${gear.emoji}</span>
-      </div>
-      <div class="gear-detail-meta">
-        <span class="badge">${categoryLabel(gear.category)}</span>
-        <span class="badge">${gear.brand}</span>
-        ${gear.price ? `<span class="badge" style="font-weight:700; color:var(--primary);">${gear.price}</span>` : ""}
-      </div>
-      <h2 style="margin:0 0 0.4rem;">${gear.brand} ${gear.name}</h2>
-      <p style="color:var(--muted); margin:0 0 0.8rem;">${gear.tagline}</p>
-      <p style="line-height:1.65; color:var(--ink);">${gear.description}</p>
-      <dl class="gear-spec-grid">
-        ${gear.specs.map((s) => `
-          <div class="gear-spec-item">
-            <dt>${s.label}</dt>
-            <dd>${s.value}</dd>
-          </div>
-        `).join("")}
-      </dl>
-    `;
   }
 
   /* ─────────────────── 評論列表 + 留言表單 ─────────────────── */
@@ -146,7 +146,7 @@ export function initEquipmentModule({ equipmentService, memberService, notify })
     const { reviews, avgRating, count } = equipmentService.getReviews(gear.id);
 
     const currentMember = memberService.getCurrentMember?.();
-    const authorName = currentMember?.name ?? "匿名球員";
+    const authorName    = currentMember?.name ?? "匿名球員";
 
     reviewWrap.innerHTML = `
       <div class="review-section">
@@ -156,20 +156,15 @@ export function initEquipmentModule({ equipmentService, memberService, notify })
           </span>
         </h3>
 
-        <!-- 留言表單 -->
         <div class="review-form-wrap">
           <h4>留下你的評論</h4>
-          <p class="gear-spec-item__label star-picker-label" style="font-size:0.85rem; color:var(--muted); margin-bottom:0.3rem;">
-            點選星星給評分
-          </p>
+          <p style="font-size:0.85rem; color:var(--muted); margin-bottom:0.3rem;">點選星星給評分</p>
           <div class="star-picker" id="eq-star-picker">
             ${[1,2,3,4,5].map((n) =>
               `<button class="star-btn" type="button" data-star="${n}" aria-label="${n} 星">★</button>`
             ).join("")}
           </div>
-          <p id="eq-star-label" style="font-size:0.8rem; color:var(--muted); margin-bottom:0.5rem;">
-            請點選星星評分
-          </p>
+          <p id="eq-star-label" style="font-size:0.8rem; color:var(--muted); margin-bottom:0.5rem;">請點選星星評分</p>
           <form id="eq-review-form" class="stack">
             <label>評論內容
               <textarea name="comment" required maxlength="300"
@@ -181,17 +176,14 @@ export function initEquipmentModule({ equipmentService, memberService, notify })
           </form>
         </div>
 
-        <!-- 已有評論列表 -->
         <div id="eq-review-list" class="list">
           ${reviews.length === 0
-            ? '<p class="hint" style="text-align:center; padding:1rem;">成為第一個留言的人！</p>'
-            : reviews.map((r) => reviewItemHTML(r)).join("")
-          }
+            ? '<p class="hint" style="text-align:center; padding:1.2rem;">成為第一個留言的人！</p>'
+            : reviews.map((r) => reviewItemHTML(r)).join("")}
         </div>
       </div>
     `;
 
-    /* 星評互動 */
     const starPicker = qs("#eq-star-picker");
     const starLabel  = qs("#eq-star-label");
     const starLabels = ["", "不推薦", "待改善", "普通", "良好", "極佳！"];
@@ -205,15 +197,10 @@ export function initEquipmentModule({ equipmentService, memberService, notify })
       });
     });
 
-    /* 送出評論 */
     qs("#eq-review-form").addEventListener("submit", (e) => {
       e.preventDefault();
-      if (selectedRating === 0) {
-        notify("請先選擇星級評分");
-        return;
-      }
-      const fd = new FormData(e.target);
-      const comment = fd.get("comment");
+      if (selectedRating === 0) { notify("請先選擇星級評分"); return; }
+      const comment = new FormData(e.target).get("comment");
       try {
         equipmentService.addReview(gear.id, { authorName, rating: selectedRating, comment });
         notify(`評論已送出 ${"★".repeat(selectedRating)}`);
@@ -255,14 +242,14 @@ export function initEquipmentModule({ equipmentService, memberService, notify })
   }
 
   /* ─────────────────── 初始化 ─────────────────── */
-  backBtn.addEventListener("click", () => {
-    closeDetail();
-    renderGrid();
+  overlayBack.addEventListener("click", closeDetail);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && overlayEl.classList.contains("is-open")) closeDetail();
   });
 
   buildCategoryTabs();
   renderGrid();
-  gearListView.classList.add("is-active");
 
   return {
     refresh() {

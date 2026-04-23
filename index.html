@@ -57,14 +57,14 @@
     </header>
 
     <nav class="tab-nav" aria-label="主功能分頁">
-      <button class="tab-button is-active" data-view="members">球員管理</button>
-      <button class="tab-button" data-view="matching">球友推薦</button>
-      <button class="tab-button" data-view="invite">約打球</button>
-      <button class="tab-button" data-view="courts">全台球場</button>
-      <button class="tab-button" data-view="forum">交流區</button>
-      <button class="tab-button" data-view="equipment">運動裝備</button>
-      <button class="tab-button" data-view="tournament">賽事資訊</button>
-      <button class="tab-button" data-view="security">架構與資安</button>
+      <button class="tab-button is-active" data-view="members">👤 球員管理</button>
+      <button class="tab-button" data-view="matching">🤝 球友推薦</button>
+      <button class="tab-button" data-view="invite">📅 約打球</button>
+      <button class="tab-button" data-view="courts">🗺️ 全台球場</button>
+      <button class="tab-button" data-view="forum">💬 交流區</button>
+      <button class="tab-button" data-view="equipment">🎽 運動裝備</button>
+      <button class="tab-button" data-view="tournament">🏆 賽事資訊</button>
+      <button class="tab-button" data-view="security">🔒 資安架構</button>
     </nav>
 
     <main class="app-main">
@@ -310,29 +310,14 @@
       <section class="view" id="view-equipment" data-view="equipment">
         <div class="card">
           <div class="tournament-header-row">
-            <h2 style="margin:0;">運動裝備</h2>
-            <span class="data-source-notice">資料來源：編輯部精選 · 持續更新</span>
+            <h2 style="margin:0;">🎽 運動裝備</h2>
+            <span class="data-source-notice">編輯部精選 · 持續更新</span>
           </div>
           <p class="hint" style="margin-bottom:0.8rem;">
-            精選網球拍、球鞋、球包等裝備介紹，點擊裝備卡查看完整規格，並在下方留下你的使用心得與星評。
+            精選網球拍、球鞋、球包等裝備介紹，點擊裝備卡即可查看完整規格與使用評論。
           </p>
-
-          <!-- 分類 Tabs -->
           <div class="gear-category-tabs" id="eq-category-tabs" role="tablist" aria-label="裝備分類"></div>
-
-          <!-- 裝備列表 / 詳情 切換容器 -->
-          <div id="eq-list-view">
-            <div class="gear-grid" id="eq-gear-grid"></div>
-          </div>
-
-          <!-- 裝備詳情（預設隱藏） -->
-          <div id="eq-detail-view" class="gear-detail">
-            <div class="gear-detail-header" style="margin-bottom:0.6rem;">
-              <button class="btn-secondary gear-back-btn" id="eq-back-btn" type="button">← 返回裝備列表</button>
-            </div>
-            <div id="eq-detail-header"></div>
-            <div id="eq-review-section"></div>
-          </div>
+          <div class="gear-grid" id="eq-gear-grid"></div>
         </div>
       </section>
 
@@ -387,6 +372,15 @@
     </main>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- 裝備詳情全頁 Overlay -->
+    <div id="eq-detail-overlay" class="page-overlay" role="dialog" aria-modal="true" aria-label="裝備詳情">
+      <header class="page-overlay__header">
+        <button id="eq-overlay-back" class="overlay-back-btn" type="button">← 返回裝備列表</button>
+        <span id="eq-overlay-title" class="overlay-title-text"></span>
+      </header>
+      <div class="page-overlay__body" id="eq-overlay-body"></div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script type="module" src="./assets/js/app.js"></script>
