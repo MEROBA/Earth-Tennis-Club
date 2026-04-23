@@ -112,18 +112,61 @@ export function buildPlayerCard(member, { isCurrentUser = false, onSchedule = nu
 
 export function initMembersModule({ memberService, matchRecordService, cities, notify, onCurrentUserChange }) {
   /* ── 球員詳情 Overlay ── */
-  const memberOverlayEl   = document.querySelector("#member-detail-overlay");
-  const memberOverlayBack = document.querySelector("#member-overlay-back");
-  const memberOverlayBody = document.querySelector("#member-overlay-body");
+  const memberOverlayEl    = document.querySelector("#member-detail-overlay");
+  const memberOverlayBack  = document.querySelector("#member-overlay-back");
+  const memberOverlayBody  = document.querySelector("#member-overlay-body");
   const memberOverlayTitle = document.querySelector("#member-overlay-title");
+  const navMemberArea      = document.querySelector("#nav-member-area");
+  const loginOverlayEl     = document.querySelector("#login-overlay");
+  const loginOverlayBack   = document.querySelector("#login-overlay-back");
+  const loginMemberList    = document.querySelector("#login-member-list");
+
+  /* showHidden state per member */
+  const showHiddenMap = new Map();
 
   function openMemberDetail(member) {
-    memberOverlayTitle.textContent = member.name;
-    memberOverlayBody.innerHTML = memberDetailHTML(member);
+    const isSelf = member.id === memberService.getCurrentUserId();
+    memberOverlayTitle.textContent = isSelf ? `👤 ${member.name}（我）` : member.name;
+    memberOverlayBody.innerHTML = memberDetailHTML(member, isSelf);
 
-    /* Wire score-recording buttons */
+    /* Score-recording buttons */
     memberOverlayBody.querySelectorAll("[data-score-btn]").forEach((btn) => {
       btn.addEventListener("click", () => showScoreForm(member, btn.dataset.scoreBtn));
+    });
+
+    /* Hide a record */
+    memberOverlayBody.querySelectorAll("[data-hide-record]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        matchRecordService.updateRecord(btn.dataset.hideRecord, { hidden: true });
+        notify("已隱藏此對戰紀錄");
+        openMemberDetail(member);
+      });
+    });
+
+    /* Unhide a record */
+    memberOverlayBody.querySelectorAll("[data-unhide-record]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        matchRecordService.updateRecord(btn.dataset.unhideRecord, { hidden: false });
+        notify("已恢復顯示");
+        openMemberDetail(member);
+      });
+    });
+
+    /* Toggle show-hidden */
+    memberOverlayBody.querySelector("#toggle-hidden-records")?.addEventListener("click", () => {
+      showHiddenMap.set(member.id, !showHiddenMap.get(member.id));
+      openMemberDetail(member);
+    });
+
+    /* Edit button (self only) */
+    memberOverlayBody.querySelector("#overlay-edit-btn")?.addEventListener("click", () => {
+      closeMemberDetail();
+      document.querySelector('[data-view="members"]')?.click();
+      if (formCard) {
+        formCard.style.display = "block";
+        if (editToggleBtn) editToggleBtn.textContent = "收起編輯";
+        prefillForm(member);
+      }
     });
 
     memberOverlayEl.classList.add("is-open");
@@ -212,7 +255,7 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
     document.body.style.overflow = "";
   }
 
-  function memberDetailHTML(m) {
+  function memberDetailHTML(m, isSelf = false) {
     const ntrpLevel = ntrpLevelLabel(Number(m.ntrp));
     const genderLabel = GENDER_LABELS[m.gender] || m.gender;
     const surfaceLabel = SURFACE_LABELS[m.preferredSurface] || m.preferredSurface;
@@ -235,6 +278,11 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
             </div>
             <div class="member-profile__location">📍 ${escHtml(m.city)}</div>
           </div>
+          ${isSelf ? `
+          <div class="member-profile__self-actions">
+            <span class="badge member-profile__self-badge">👤 我的球員卡</span>
+            <button id="overlay-edit-btn" class="btn-secondary" type="button" style="font-size:0.82rem;margin-top:0.45rem;">✏️ 編輯資料</button>
+          </div>` : ""}
         </div>
 
         <!-- 統計格線 -->
@@ -297,25 +345,41 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
         <!-- 對戰紀錄 -->
         <div class="card">
           <h3 style="margin-bottom:0.8rem;">⚔️ 對戰紀錄</h3>
-          ${matchRecordsHTML(m)}
+          ${matchRecordsHTML(m, isSelf)}
         </div>
       </div>
     `;
   }
 
-  function matchRecordsHTML(m) {
+  function matchRecordsHTML(m, isSelf = false) {
     const records = matchRecordService?.getRecordsForMember(m.id) ?? [];
     if (!records.length) {
       return `<p class="hint" style="text-align:center;padding:0.8rem;">尚無對戰紀錄</p>`;
     }
     const currentId = memberService.getCurrentUserId();
-    return records.map((r) => {
+    const showHidden = showHiddenMap.get(m.id) ?? false;
+    const hiddenCount = records.filter((r) => r.hidden).length;
+
+    const visible = isSelf && !showHidden ? records.filter((r) => !r.hidden) : records;
+
+    const toggleBtn = isSelf && hiddenCount > 0 ? `
+      <button id="toggle-hidden-records" class="btn-secondary" type="button"
+              style="font-size:0.78rem;margin-bottom:0.8rem;">
+        ${showHidden ? `👁 隱藏已隱藏紀錄 (${hiddenCount})` : `👁 顯示已隱藏紀錄 (${hiddenCount})`}
+      </button>
+    ` : "";
+
+    if (!visible.length) {
+      return toggleBtn + `<p class="hint" style="text-align:center;padding:0.8rem;">所有紀錄已隱藏</p>`;
+    }
+
+    return toggleBtn + visible.map((r) => {
       const isP1 = r.player1Id === m.id;
       const opponentName = isP1 ? r.player2Name : r.player1Name;
       const opponentId   = isP1 ? r.player2Id   : r.player1Id;
       const didWin = r.winner === (isP1 ? "p1" : "p2");
       const isDraw = r.winner === "draw";
-      const setsStr = r.sets.map((s) => `${s.p1}–${s.p2}`).join("  ");
+      const setsStr = (r.sets || []).map((s) => `${s.p1}–${s.p2}`).join("  ");
       const canRecord = r.status === "scheduled" &&
         (currentId === m.id || currentId === opponentId);
 
@@ -323,14 +387,24 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
       if (r.status === "scheduled") badge = `<span class="badge-upcoming">待對戰</span>`;
       else if (isDraw)              badge = `<span class="badge">平局</span>`;
       else if (didWin)              badge = `<span class="badge-live">勝</span>`;
-      else                         badge = `<span class="badge-completed">負</span>`;
+      else                          badge = `<span class="badge-completed">負</span>`;
+
+      const hideBtn = isSelf && !r.hidden ? `
+        <button class="btn-secondary" data-hide-record="${r.id}"
+                style="font-size:0.75rem;margin-top:0.45rem;" type="button">🚫 不顯示</button>
+      ` : "";
+      const unhideBtn = isSelf && r.hidden ? `
+        <button class="btn-secondary" data-unhide-record="${r.id}"
+                style="font-size:0.75rem;margin-top:0.45rem;" type="button">↩ 恢復顯示</button>
+      ` : "";
 
       return `
-        <div class="match-record-item">
+        <div class="match-record-item${r.hidden ? " is-hidden-record" : ""}">
           <div class="match-record-header">
             ${badge}
             <span class="match-record-opponent">vs <strong>${escHtml(opponentName)}</strong></span>
             <span class="match-record-date">${r.date}</span>
+            ${r.hidden ? `<span style="font-size:0.68rem;color:var(--ink-muted);">[已隱藏]</span>` : ""}
           </div>
           ${setsStr ? `<div class="match-record-sets">${setsStr}</div>` : ""}
           ${r.venue ? `<div class="match-record-venue">🏟️ ${escHtml(r.venue)}</div>` : ""}
@@ -339,6 +413,7 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
                     style="margin-top:0.5rem;font-size:0.8rem;" type="button">✏️ 記錄比分</button>
             <div data-score-form-for="${r.id}"></div>
           ` : ""}
+          ${hideBtn}${unhideBtn}
         </div>
       `;
     }).join("");
@@ -375,8 +450,12 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
   }
 
   memberOverlayBack?.addEventListener("click", closeMemberDetail);
+  loginOverlayBack?.addEventListener("click", closeLoginOverlay);
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && memberOverlayEl?.classList.contains("is-open")) closeMemberDetail();
+    if (e.key === "Escape") {
+      if (memberOverlayEl?.classList.contains("is-open")) closeMemberDetail();
+      else if (loginOverlayEl?.classList.contains("is-open")) closeLoginOverlay();
+    }
   });
 
   const formCard = document.querySelector("#member-form-card");
@@ -510,7 +589,10 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
       currentCardWrap.innerHTML = "<p class='hint'>尚未選擇會員。</p>";
       return;
     }
-    currentCardWrap.append(buildPlayerCard(user, { isCurrentUser: true }));
+    currentCardWrap.append(buildPlayerCard(user, {
+      isCurrentUser: true,
+      onClick: () => openMemberDetail(user),
+    }));
   }
 
   function renderCurrentUserSelect() {
@@ -536,9 +618,74 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
     renderList(list, members.map((m) => buildPlayerCard(m, { onClick: openMemberDetail })));
   }
 
+  function updateNavMemberBtn() {
+    if (!navMemberArea) return;
+    const user = memberService.getCurrentUser();
+    if (!user) {
+      navMemberArea.innerHTML = `
+        <button class="nav-auth-btn" id="nav-login-btn" type="button">登入</button>
+        <button class="nav-auth-btn nav-auth-btn--primary" id="nav-register-btn" type="button">+ 註冊</button>
+      `;
+      navMemberArea.querySelector("#nav-login-btn")?.addEventListener("click", openLoginOverlay);
+      navMemberArea.querySelector("#nav-register-btn")?.addEventListener("click", () => {
+        document.querySelector('[data-view="members"]')?.click();
+        if (formCard) {
+          formCard.style.display = "block";
+          if (editToggleBtn) editToggleBtn.textContent = "收起編輯";
+        }
+      });
+    } else {
+      navMemberArea.innerHTML = `
+        <button class="nav-member-chip" id="nav-member-chip-btn" type="button">
+          <span class="nav-member-avatar">${escHtml(user.name.charAt(0).toUpperCase())}</span>
+          <span class="nav-member-name">${escHtml(user.name)}</span>
+          <span class="nav-member-ntrp">NTRP ${Number(user.ntrp).toFixed(1)}</span>
+        </button>
+      `;
+      navMemberArea.querySelector("#nav-member-chip-btn")?.addEventListener("click", () => openMemberDetail(user));
+    }
+  }
+
+  function openLoginOverlay() {
+    if (!loginOverlayEl || !loginMemberList) return;
+    const members = memberService.getMembers();
+    loginMemberList.innerHTML = members.map((m) => `
+      <div class="login-member-item" data-login-id="${escHtml(m.id)}" role="button" tabindex="0">
+        <div class="login-member-avatar">${escHtml(m.name.charAt(0).toUpperCase())}</div>
+        <div class="login-member-info">
+          <div class="login-member-name">${escHtml(m.name)}</div>
+          <div class="login-member-meta">${escHtml(m.city)} · NTRP ${Number(m.ntrp).toFixed(1)}</div>
+        </div>
+      </div>
+    `).join("");
+
+    loginMemberList.querySelectorAll("[data-login-id]").forEach((el) => {
+      const handler = () => {
+        const id = el.dataset.loginId;
+        const chosen = members.find((m) => m.id === id);
+        memberService.setCurrentUserId(id);
+        closeLoginOverlay();
+        refreshAll();
+        notify(`已登入為 ${chosen?.name ?? id}`);
+      };
+      el.addEventListener("click", handler);
+      el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") handler(); });
+    });
+
+    loginOverlayEl.classList.add("is-open");
+    loginOverlayEl.scrollTop = 0;
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLoginOverlay() {
+    loginOverlayEl?.classList.remove("is-open");
+    document.body.style.overflow = "";
+  }
+
   function refreshAll() {
     renderMembers();
     renderCurrentUserSelect();
+    updateNavMemberBtn();
     onCurrentUserChange();
   }
 

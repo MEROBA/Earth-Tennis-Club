@@ -52,6 +52,7 @@ function initTabs() {
       const target = btn.dataset.view;
       buttons.forEach((b) => b.classList.toggle("is-active", b === btn));
       views.forEach((v) => v.classList.toggle("is-active", v.dataset.view === target));
+      if (target === "courts") courtsModule?.onTabShown?.();
     });
   });
 }

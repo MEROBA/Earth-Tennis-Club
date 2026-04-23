@@ -1810,6 +1810,158 @@ code {
   margin-top: 0.35rem;
 }
 
+/* ── Nav member area ── */
+.nav-member-area {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.nav-auth-btn {
+  border: 1.5px solid rgba(0, 71, 160, 0.22);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-secondary);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+  white-space: nowrap;
+}
+.nav-auth-btn:hover {
+  background: rgba(0, 71, 160, 0.06);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.nav-auth-btn--primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.nav-auth-btn--primary:hover {
+  background: var(--primary-hover);
+  color: #fff;
+  border-color: var(--primary-hover);
+}
+
+.nav-member-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1.5px solid rgba(0, 71, 160, 0.22);
+  border-radius: 999px;
+  background: var(--bg-subtle);
+  padding: 0.28rem 0.75rem 0.28rem 0.32rem;
+  cursor: pointer;
+  transition: background var(--transition), box-shadow var(--transition), border-color var(--transition);
+  white-space: nowrap;
+}
+.nav-member-chip:hover {
+  background: rgba(0, 71, 160, 0.07);
+  border-color: var(--ao-sky);
+  box-shadow: 0 2px 8px rgba(0, 71, 160, 0.12);
+}
+
+.nav-member-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ao-royal), var(--ao-sky));
+  color: #fff;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-member-name {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.nav-member-ntrp {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(0, 71, 160, 0.07);
+  border-radius: 999px;
+  padding: 0.08rem 0.45rem;
+}
+
+/* ── Self-view badge in profile overlay ── */
+.member-profile__self-actions {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.member-profile__self-badge {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.4);
+  font-size: 0.78rem;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+}
+
+/* ── Login member list ── */
+.login-member-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  background: var(--bg-subtle);
+  transition: background var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+.login-member-item:hover {
+  background: rgba(0, 71, 160, 0.05);
+  border-color: var(--ao-sky);
+  box-shadow: var(--shadow-sm);
+}
+.login-member-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ao-royal), var(--ao-sky));
+  color: #fff;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.login-member-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.login-member-meta {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  margin-top: 0.08rem;
+}
+
+/* ── Hidden match record ── */
+.match-record-item.is-hidden-record {
+  opacity: 0.55;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 8px,
+    rgba(0,0,0,0.018) 8px,
+    rgba(0,0,0,0.018) 16px
+  );
+}
+
 /* ═══════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════ */
@@ -1829,6 +1981,11 @@ code {
   body { padding: 0.9rem 0.9rem 2.5rem; }
   .tab-nav { overflow-x: auto; flex-wrap: nowrap; padding: 0.4rem; gap: 0.3rem; }
   .tab-button { flex: 0 0 auto; font-size: 0.82rem; padding: 0.4rem 0.7rem; }
+  .nav-member-area { flex-shrink: 0; }
+  .nav-member-name { display: none; }
+  .nav-member-ntrp { display: none; }
+  .nav-member-chip { padding: 0.28rem; border-radius: 50%; }
+  .nav-auth-btn { font-size: 0.76rem; padding: 0.3rem 0.55rem; }
   .gear-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; }
   .map { min-height: 300px; }
   .player-card-grid { grid-template-columns: 1fr; }

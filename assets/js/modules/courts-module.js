@@ -150,8 +150,7 @@ export function initCourtsModule({ courtService, cities, memberService, notify }
   renderCourts();
 
   return {
-    refresh() {
-      renderCourts();
-    },
+    refresh() { renderCourts(); },
+    onTabShown() { if (map) setTimeout(() => map.invalidateSize(), 80); },
   };
 }

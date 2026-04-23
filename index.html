@@ -65,6 +65,7 @@
       <button class="tab-button" data-view="equipment">🎽 運動裝備</button>
       <button class="tab-button" data-view="tournament">🏆 賽事資訊</button>
       <button class="tab-button" data-view="security">🔒 資安架構</button>
+      <div id="nav-member-area" class="nav-member-area"></div>
     </nav>
 
     <main class="app-main">
@@ -502,6 +503,18 @@
         <span id="tn-overlay-title" class="overlay-title-text"></span>
       </header>
       <div class="page-overlay__body" id="tn-overlay-body"></div>
+    </div>
+
+    <!-- 登入選擇 Overlay -->
+    <div id="login-overlay" class="page-overlay" role="dialog" aria-modal="true" aria-label="選擇登入會員">
+      <header class="page-overlay__header">
+        <button id="login-overlay-back" class="overlay-back-btn" type="button">← 取消</button>
+        <span class="overlay-title-text">選擇登入身分</span>
+      </header>
+      <div class="page-overlay__body" style="max-width:480px;">
+        <p class="hint" style="margin-bottom:1rem;">請選擇要登入的球員帳號（模擬登入）</p>
+        <div id="login-member-list"></div>
+      </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
