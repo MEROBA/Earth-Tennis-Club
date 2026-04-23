@@ -69,7 +69,7 @@ export function initEquipmentModule({ equipmentService, memberService, notify })
           <div class="gear-card__body">
             <p class="gear-card__category">${categoryLabel(gear.category)}</p>
             <h3 class="gear-card__name">${gear.brand} ${gear.name}</h3>
-            <p class="gear-card__tagline">${gear.tagline}</p>
+            <p class="gear-card__brand">${gear.tagline}</p>
             <div class="gear-card__rating-row">
               ${starsHTML(avgRating, count)}
             </div>

@@ -942,6 +942,14 @@ textarea { min-height: 88px; resize: vertical; }
   gap: 1.5rem;
   align-items: start;
 }
+.overlay-left  { min-width: 0; }
+.overlay-right {
+  min-width: 0;
+  position: sticky;
+  top: calc(56px + 1.5rem);
+  max-height: calc(100vh - 56px - 3rem);
+  overflow-y: auto;
+}
 
 /* Gear detail elements inside overlay */
 .gear-detail-hero {
