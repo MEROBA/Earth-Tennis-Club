@@ -9,6 +9,22 @@ export const TOURNAMENT_TOURS = Object.freeze([
   { id: "slam", label: "大滿貫" },
 ]);
 
+/* ── Mock 球員資料 ── */
+const P = {
+  sinner:    { name: "Jannik Sinner",    nationality: "義大利",   flag: "🇮🇹", initials: "JS", color: "#009246" },
+  alcaraz:   { name: "Carlos Alcaraz",   nationality: "西班牙",   flag: "🇪🇸", initials: "CA", color: "#AA151B" },
+  djokovic:  { name: "Novak Djokovic",   nationality: "塞爾維亞", flag: "🇷🇸", initials: "ND", color: "#003DA5" },
+  medvedev:  { name: "Daniil Medvedev",  nationality: "俄羅斯",   flag: "🇷🇺", initials: "DM", color: "#CC0000" },
+  zverev:    { name: "Alexander Zverev", nationality: "德國",     flag: "🇩🇪", initials: "AZ", color: "#3B3C40" },
+  ruud:      { name: "Casper Ruud",      nationality: "挪威",     flag: "🇳🇴", initials: "CR", color: "#EF2B2D" },
+  sabalenka: { name: "Aryna Sabalenka",  nationality: "白俄羅斯", flag: "🇧🇾", initials: "AS", color: "#CF101A" },
+  swiatek:   { name: "Iga Swiatek",      nationality: "波蘭",     flag: "🇵🇱", initials: "IS", color: "#DC143C" },
+  gauff:     { name: "Coco Gauff",       nationality: "美國",     flag: "🇺🇸", initials: "CG", color: "#0A3161" },
+  keys:      { name: "Madison Keys",     nationality: "美國",     flag: "🇺🇸", initials: "MK", color: "#B22234" },
+  rybakina:  { name: "Elena Rybakina",   nationality: "哈薩克",   flag: "🇰🇿", initials: "ER", color: "#00AFCA" },
+  halep:     { name: "Simona Halep",     nationality: "羅馬尼亞", flag: "🇷🇴", initials: "SH", color: "#002B7F" },
+};
+
 /* 賽事狀態: "live" | "upcoming" | "completed" */
 export const TOURNAMENT_MOCK = Object.freeze([
   {
@@ -27,8 +43,52 @@ export const TOURNAMENT_MOCK = Object.freeze([
     description:
       "澳洲公開賽是四大滿貫賽事之一，每年一月在墨爾本公園球場舉行。2026 年版本以全新的天藍色視覺識別系統亮相，延續球場硬地快速風格，吸引全球頂尖球員角逐歷史最高獎金。",
     draws: { ms: 128, ws: 128, md: 64, wd: 64 },
-    champions: { ms: "待定", ws: "待定" },
+    champions: { ms: "Jannik Sinner", ws: "Aryna Sabalenka" },
     liveEnabled: false,
+    matches: [
+      {
+        id: "t001-ms-f", round: "男單決賽", court: "Rod Laver Arena",
+        status: "completed", time: "2026-01-25",
+        player1: P.sinner, player2: P.alcaraz,
+        sets: [{ p1: 6, p2: 4 }, { p1: 6, p2: 3 }, { p1: 7, p2: 5 }],
+        winner: "p1",
+      },
+      {
+        id: "t001-ms-sf1", round: "男單半決賽", court: "Rod Laver Arena",
+        status: "completed", time: "2026-01-23",
+        player1: P.sinner, player2: P.zverev,
+        sets: [{ p1: 7, p2: 6 }, { p1: 6, p2: 3 }, { p1: 6, p2: 4 }],
+        winner: "p1",
+      },
+      {
+        id: "t001-ms-sf2", round: "男單半決賽", court: "Rod Laver Arena",
+        status: "completed", time: "2026-01-23",
+        player1: P.alcaraz, player2: P.djokovic,
+        sets: [{ p1: 6, p2: 4 }, { p1: 7, p2: 6 }],
+        winner: "p1",
+      },
+      {
+        id: "t001-ws-f", round: "女單決賽", court: "Rod Laver Arena",
+        status: "completed", time: "2026-01-24",
+        player1: P.sabalenka, player2: P.swiatek,
+        sets: [{ p1: 6, p2: 3 }, { p1: 7, p2: 5 }],
+        winner: "p1",
+      },
+      {
+        id: "t001-ws-sf1", round: "女單半決賽", court: "Rod Laver Arena",
+        status: "completed", time: "2026-01-22",
+        player1: P.sabalenka, player2: P.keys,
+        sets: [{ p1: 6, p2: 2 }, { p1: 6, p2: 3 }],
+        winner: "p1",
+      },
+      {
+        id: "t001-ws-sf2", round: "女單半決賽", court: "Rod Laver Arena",
+        status: "completed", time: "2026-01-22",
+        player1: P.swiatek, player2: P.rybakina,
+        sets: [{ p1: 7, p2: 5 }, { p1: 6, p2: 3 }],
+        winner: "p1",
+      },
+    ],
   },
   {
     id: "t002",
@@ -48,6 +108,20 @@ export const TOURNAMENT_MOCK = Object.freeze([
     draws: { ms: 128, ws: 128, md: 64, wd: 64 },
     champions: { ms: "—", ws: "—" },
     liveEnabled: false,
+    matches: [
+      {
+        id: "t002-ms-f", round: "男單決賽（預測）", court: "Court Philippe-Chatrier",
+        status: "scheduled", time: "2026-06-07",
+        player1: P.alcaraz, player2: P.sinner,
+        sets: [], winner: null,
+      },
+      {
+        id: "t002-ws-f", round: "女單決賽（預測）", court: "Court Philippe-Chatrier",
+        status: "scheduled", time: "2026-06-06",
+        player1: P.swiatek, player2: P.sabalenka,
+        sets: [], winner: null,
+      },
+    ],
   },
   {
     id: "t003",
@@ -67,6 +141,7 @@ export const TOURNAMENT_MOCK = Object.freeze([
     draws: { ms: 128, ws: 128, md: 64, wd: 64 },
     champions: { ms: "—", ws: "—" },
     liveEnabled: false,
+    matches: [],
   },
   {
     id: "t004",
@@ -86,6 +161,7 @@ export const TOURNAMENT_MOCK = Object.freeze([
     draws: { ms: 128, ws: 128, md: 64, wd: 64 },
     champions: { ms: "—", ws: "—" },
     liveEnabled: false,
+    matches: [],
   },
   {
     id: "t005",
@@ -103,8 +179,52 @@ export const TOURNAMENT_MOCK = Object.freeze([
     description:
       "馬德里公開賽在首都核心的 Caja Mágica 球場舉行，是紅土季最重要的賽前熱身賽事之一，同時也是規模最大的男女合辦賽事（ATP 1000 + WTA 1000）。",
     draws: { ms: 96, ws: 96 },
-    champions: { ms: "—", ws: "—" },
+    champions: { ms: "進行中", ws: "進行中" },
     liveEnabled: true,
+    matches: [
+      {
+        id: "t005-ms-qf1", round: "男單四強", court: "Manolo Santana Stadium",
+        status: "live", time: "2026-04-23 19:00",
+        player1: P.alcaraz, player2: P.sinner,
+        sets: [{ p1: 6, p2: 4 }, { p1: 3, p2: null }],
+        winner: null,
+        liveScore: { p1: "3", p2: "2", currentGame: { p1: "40", p2: "30" } },
+      },
+      {
+        id: "t005-ms-qf2", round: "男單四強", court: "Arantxa Sánchez Stadium",
+        status: "completed", time: "2026-04-23 16:00",
+        player1: P.djokovic, player2: P.zverev,
+        sets: [{ p1: 7, p2: 5 }, { p1: 6, p2: 3 }],
+        winner: "p1",
+      },
+      {
+        id: "t005-ms-qf3", round: "男單四強", court: "Arantxa Sánchez Stadium",
+        status: "scheduled", time: "2026-04-24 15:00",
+        player1: P.ruud, player2: P.medvedev,
+        sets: [], winner: null,
+      },
+      {
+        id: "t005-ws-qf1", round: "女單四強", court: "Manolo Santana Stadium",
+        status: "live", time: "2026-04-23 21:00",
+        player1: P.swiatek, player2: P.gauff,
+        sets: [{ p1: 6, p2: 7 }, { p1: 4, p2: null }],
+        winner: null,
+        liveScore: { p1: "4", p2: "3", currentGame: { p1: "0", p2: "15" } },
+      },
+      {
+        id: "t005-ws-qf2", round: "女單四強", court: "Arantxa Sánchez Stadium",
+        status: "completed", time: "2026-04-22 17:00",
+        player1: P.sabalenka, player2: P.rybakina,
+        sets: [{ p1: 6, p2: 4 }, { p1: 6, p2: 2 }],
+        winner: "p1",
+      },
+      {
+        id: "t005-ws-qf3", round: "女單四強", court: "Arantxa Sánchez Stadium",
+        status: "scheduled", time: "2026-04-24 13:00",
+        player1: P.keys, player2: P.halep,
+        sets: [], winner: null,
+      },
+    ],
   },
   {
     id: "t006",
@@ -124,6 +244,7 @@ export const TOURNAMENT_MOCK = Object.freeze([
     draws: { ms: 96, ws: 96 },
     champions: { ms: "—", ws: "—" },
     liveEnabled: false,
+    matches: [],
   },
   {
     id: "t007",
@@ -141,8 +262,52 @@ export const TOURNAMENT_MOCK = Object.freeze([
     description:
       "邁阿密公開賽在 Hard Rock 球場舉行，與印第安威爾斯公開賽共同構成「陽光雙賽」。海灘環境與高水準賽事結合，是每年 3 月最受關注的硬地賽事之一。",
     draws: { ms: 96, ws: 96 },
-    champions: { ms: "—", ws: "—" },
+    champions: { ms: "Daniil Medvedev", ws: "Coco Gauff" },
     liveEnabled: false,
+    matches: [
+      {
+        id: "t007-ms-f", round: "男單決賽", court: "Hard Rock Stadium Court",
+        status: "completed", time: "2026-03-30",
+        player1: P.medvedev, player2: P.sinner,
+        sets: [{ p1: 6, p2: 4 }, { p1: 6, p2: 4 }],
+        winner: "p1",
+      },
+      {
+        id: "t007-ms-sf1", round: "男單半決賽", court: "Hard Rock Stadium Court",
+        status: "completed", time: "2026-03-28",
+        player1: P.medvedev, player2: P.djokovic,
+        sets: [{ p1: 6, p2: 3 }, { p1: 6, p2: 4 }],
+        winner: "p1",
+      },
+      {
+        id: "t007-ms-sf2", round: "男單半決賽", court: "Hard Rock Stadium Court",
+        status: "completed", time: "2026-03-28",
+        player1: P.sinner, player2: P.alcaraz,
+        sets: [{ p1: 7, p2: 6 }, { p1: 6, p2: 3 }],
+        winner: "p1",
+      },
+      {
+        id: "t007-ws-f", round: "女單決賽", court: "Hard Rock Stadium Court",
+        status: "completed", time: "2026-03-29",
+        player1: P.gauff, player2: P.keys,
+        sets: [{ p1: 7, p2: 5 }, { p1: 6, p2: 3 }],
+        winner: "p1",
+      },
+      {
+        id: "t007-ws-sf1", round: "女單半決賽", court: "Hard Rock Stadium Court",
+        status: "completed", time: "2026-03-27",
+        player1: P.gauff, player2: P.swiatek,
+        sets: [{ p1: 6, p2: 4 }, { p1: 6, p2: 4 }],
+        winner: "p1",
+      },
+      {
+        id: "t007-ws-sf2", round: "女單半決賽", court: "Hard Rock Stadium Court",
+        status: "completed", time: "2026-03-27",
+        player1: P.keys, player2: P.sabalenka,
+        sets: [{ p1: 6, p2: 3 }, { p1: 7, p2: 6 }],
+        winner: "p1",
+      },
+    ],
   },
   {
     id: "t008",
@@ -162,5 +327,6 @@ export const TOURNAMENT_MOCK = Object.freeze([
     draws: { ms: 32, ws: 96 },
     champions: { ms: "—", ws: "—" },
     liveEnabled: false,
+    matches: [],
   },
 ]);

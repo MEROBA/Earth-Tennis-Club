@@ -325,29 +325,14 @@
       <section class="view" id="view-tournament" data-view="tournament">
         <div class="card">
           <div class="tournament-header-row">
-            <h2 style="margin:0;">賽事資訊</h2>
-            <span class="data-source-notice">
-              🔌 API / 爬蟲接口已預留 &nbsp;·&nbsp; 目前顯示 Mock 資料
-            </span>
+            <h2 style="margin:0;">🏆 賽事資訊</h2>
+            <span class="data-source-notice">🔌 API 接口已預留 · 目前為 Mock 資料</span>
           </div>
           <p class="hint" style="margin-bottom:0.8rem;">
-            全球各大網球賽事一覽，包含大滿貫、ATP / WTA Masters 與亞洲重點賽事。
-            點擊賽事卡可查看詳細資訊、籤表與即時比分（實況功能待串接）。
+            全球各大網球賽事一覽，包含大滿貫、ATP / WTA Masters 與亞洲重點賽事。點擊賽事卡可查看詳細比分與對戰組合。
           </p>
-
-          <!-- 巡迴賽篩選 -->
           <div class="tournament-filters" id="tn-filter-bar" role="tablist" aria-label="賽事篩選"></div>
-
-          <!-- 列表 / 詳情切換 -->
-          <div id="tn-list-view">
-            <div class="tournament-grid" id="tn-tournament-grid"></div>
-          </div>
-
-          <!-- 詳情（動態插入） -->
-          <div id="tn-detail-view" class="tournament-detail"></div>
-
-          <!-- 隱藏的返回按鈕（供 module 綁定初始事件，避免 DOM 未就緒） -->
-          <button id="tn-back-btn" type="button" style="display:none;" aria-hidden="true">返回</button>
+          <div class="tournament-grid" id="tn-tournament-grid"></div>
         </div>
       </section>
 
@@ -380,6 +365,24 @@
         <span id="eq-overlay-title" class="overlay-title-text"></span>
       </header>
       <div class="page-overlay__body" id="eq-overlay-body"></div>
+    </div>
+
+    <!-- 球員詳情全頁 Overlay -->
+    <div id="member-detail-overlay" class="page-overlay" role="dialog" aria-modal="true" aria-label="球員詳情">
+      <header class="page-overlay__header">
+        <button id="member-overlay-back" class="overlay-back-btn" type="button">← 返回球員列表</button>
+        <span id="member-overlay-title" class="overlay-title-text"></span>
+      </header>
+      <div class="page-overlay__body" id="member-overlay-body"></div>
+    </div>
+
+    <!-- 賽事詳情全頁 Overlay -->
+    <div id="tn-detail-overlay" class="page-overlay" role="dialog" aria-modal="true" aria-label="賽事詳情">
+      <header class="page-overlay__header">
+        <button id="tn-overlay-back" class="overlay-back-btn" type="button">← 返回賽事列表</button>
+        <span id="tn-overlay-title" class="overlay-title-text"></span>
+      </header>
+      <div class="page-overlay__body" id="tn-overlay-body"></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>

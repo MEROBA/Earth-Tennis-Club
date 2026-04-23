@@ -40,8 +40,19 @@ function fillCitySelect(select, cities, includeAll = false) {
   });
 }
 
-export function buildPlayerCard(member, { isCurrentUser = false, onSchedule = null } = {}) {
-  const card = createNode("article", `player-card${isCurrentUser ? " is-self" : ""}`);
+export function buildPlayerCard(member, { isCurrentUser = false, onSchedule = null, onClick = null } = {}) {
+  const card = createNode("article", `player-card${isCurrentUser ? " is-self" : ""}${onClick ? " is-clickable" : ""}`);
+  if (onClick) {
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("role", "button");
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("button")) return;
+      onClick(member);
+    });
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") onClick(member);
+    });
+  }
 
   const photoWrap = createNode("div", "player-card__photo");
   if (member.photo) {
@@ -90,11 +101,155 @@ export function buildPlayerCard(member, { isCurrentUser = false, onSchedule = nu
     body.append(btn);
   }
 
+  if (onClick && !isCurrentUser) {
+    const hint = createNode("span", "player-card__view-hint", "查看詳情 →");
+    body.append(hint);
+  }
+
   card.append(photoWrap, body);
   return card;
 }
 
 export function initMembersModule({ memberService, cities, notify, onCurrentUserChange }) {
+  /* ── 球員詳情 Overlay ── */
+  const memberOverlayEl   = document.querySelector("#member-detail-overlay");
+  const memberOverlayBack = document.querySelector("#member-overlay-back");
+  const memberOverlayBody = document.querySelector("#member-overlay-body");
+  const memberOverlayTitle = document.querySelector("#member-overlay-title");
+
+  function openMemberDetail(member) {
+    memberOverlayTitle.textContent = member.name;
+    memberOverlayBody.innerHTML = memberDetailHTML(member);
+    memberOverlayEl.classList.add("is-open");
+    memberOverlayEl.scrollTop = 0;
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeMemberDetail() {
+    memberOverlayEl.classList.remove("is-open");
+    document.body.style.overflow = "";
+  }
+
+  function memberDetailHTML(m) {
+    const ntrpLevel = ntrpLevelLabel(Number(m.ntrp));
+    const genderLabel = GENDER_LABELS[m.gender] || m.gender;
+    const surfaceLabel = SURFACE_LABELS[m.preferredSurface] || m.preferredSurface;
+    const styleLabel = PLAY_STYLE_LABELS[m.playStyle] || m.playStyle;
+
+    return `
+      <div class="member-profile">
+        <!-- 頂部 Banner -->
+        <div class="member-profile__banner">
+          <div class="member-profile__avatar">
+            ${m.photo
+              ? `<img src="${m.photo}" alt="${escHtml(m.name)}" />`
+              : `<span>${m.name.charAt(0).toUpperCase()}</span>`}
+          </div>
+          <div class="member-profile__hero-info">
+            <h2 class="member-profile__name">${escHtml(m.name)}</h2>
+            <div class="member-profile__ntrp">
+              <span class="player-card__ntrp" style="font-size:1rem;">NTRP ${Number(m.ntrp).toFixed(1)}</span>
+              <span class="member-profile__level-label">${ntrpLevel}</span>
+            </div>
+            <div class="member-profile__location">📍 ${escHtml(m.city)}</div>
+          </div>
+        </div>
+
+        <!-- 統計格線 -->
+        <div class="card member-profile__stats-card">
+          <h3 style="margin-bottom:0.9rem;">球員資料</h3>
+          <dl class="member-stats-grid">
+            <div class="member-stat-item">
+              <dt>性別</dt><dd>${genderLabel}</dd>
+            </div>
+            <div class="member-stat-item">
+              <dt>年齡</dt><dd>${m.age} 歲</dd>
+            </div>
+            ${m.height ? `
+            <div class="member-stat-item">
+              <dt>身高</dt><dd>${m.height} cm</dd>
+            </div>` : ""}
+            <div class="member-stat-item">
+              <dt>球齡</dt><dd>${m.yearsPlaying} 年</dd>
+            </div>
+            <div class="member-stat-item">
+              <dt>NTRP 等級</dt><dd>${Number(m.ntrp).toFixed(1)} — ${ntrpLevel}</dd>
+            </div>
+            <div class="member-stat-item">
+              <dt>慣用場地</dt><dd>${surfaceLabel}</dd>
+            </div>
+            <div class="member-stat-item">
+              <dt>打法風格</dt><dd>${styleLabel}</dd>
+            </div>
+            <div class="member-stat-item">
+              <dt>所在縣市</dt><dd>📍 ${escHtml(m.city)}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- 可打球時段 -->
+        <div class="card">
+          <h3 style="margin-bottom:0.6rem;">⏰ 可打球時段</h3>
+          <p style="color:var(--ink);font-size:0.95rem; line-height:1.6;">
+            ${m.availability ? escHtml(m.availability) : '<span style="color:var(--ink-muted);">尚未填寫</span>'}
+          </p>
+        </div>
+
+        <!-- NTRP 說明 -->
+        <div class="card member-ntrp-card">
+          <h3 style="margin-bottom:0.8rem;">🎾 NTRP 等級說明</h3>
+          <div class="ntrp-meter">
+            <div class="ntrp-meter__bar">
+              <div class="ntrp-meter__fill" style="width:${((Number(m.ntrp) - 1.5) / 5.5) * 100}%;"></div>
+              <div class="ntrp-meter__marker" style="left:${((Number(m.ntrp) - 1.5) / 5.5) * 100}%;"></div>
+            </div>
+            <div class="ntrp-meter__labels">
+              <span>1.5</span><span>3.0</span><span>4.5</span><span>7.0</span>
+            </div>
+          </div>
+          <p style="font-size:0.88rem; color:var(--ink-secondary); margin-top:0.7rem; line-height:1.65;">
+            ${ntrpDescription(Number(m.ntrp))}
+          </p>
+        </div>
+      </div>
+    `;
+  }
+
+  function ntrpLevelLabel(n) {
+    if (n <= 2.0) return "初學者";
+    if (n <= 2.5) return "入門級";
+    if (n <= 3.0) return "初中級";
+    if (n <= 3.5) return "中級";
+    if (n <= 4.0) return "中高級";
+    if (n <= 4.5) return "高級";
+    if (n <= 5.0) return "精英級";
+    return "職業級";
+  }
+
+  function ntrpDescription(n) {
+    if (n <= 2.0) return "初次接觸網球，正在學習基本握拍、站位與發球方式。";
+    if (n <= 2.5) return "能維持穩定的對打，正在建立正拍與反拍的基礎。";
+    if (n <= 3.0) return "具備基本的正反拍底線控球能力，開始發展方向性打法。";
+    if (n <= 3.5) return "能打出有方向感的底線球，發球、截擊初步掌握，賽事中開始形成策略。";
+    if (n <= 4.0) return "控球穩定、發球有力，上網截擊流暢，能在業餘賽事中保持競爭力。";
+    if (n <= 4.5) return "高度一致性與戰術意識，具備不同場地的適應能力，接近省市代表水準。";
+    if (n <= 5.0) return "能打出有威脅的上旋、切片與快速截擊，接近全國業餘頂尖或半職業水準。";
+    return "職業或準職業球員，具備完整的技術體系與比賽心理素質。";
+  }
+
+  function escHtml(str) {
+    return String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  memberOverlayBack?.addEventListener("click", closeMemberDetail);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && memberOverlayEl?.classList.contains("is-open")) closeMemberDetail();
+  });
+
   const formCard = document.querySelector("#member-form-card");
   const form = document.querySelector("#member-form");
   const photoInput = document.querySelector("#member-photo-input");
@@ -249,7 +404,7 @@ export function initMembersModule({ memberService, cities, notify, onCurrentUser
       list.innerHTML = "<p class='hint'>目前沒有會員資料。</p>";
       return;
     }
-    renderList(list, members.map((m) => buildPlayerCard(m)));
+    renderList(list, members.map((m) => buildPlayerCard(m, { onClick: openMemberDetail })));
   }
 
   function refreshAll() {

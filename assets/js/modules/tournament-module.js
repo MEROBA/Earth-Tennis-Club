@@ -1,20 +1,18 @@
 import { TOURNAMENT_TOURS } from "../data/tournaments.js";
 import { qs } from "../ui/dom.js";
 
-/**
- * 初始化「賽事資訊」頁面模組。
- */
 export function initTournamentModule({ tournamentService, notify }) {
   /* ── DOM 參考 ── */
   const filterBarEl      = qs("#tn-filter-bar");
   const tournamentGridEl = qs("#tn-tournament-grid");
-  const listViewEl       = qs("#tn-list-view");
-  const detailViewEl     = qs("#tn-detail-view");
-  const backBtn          = qs("#tn-back-btn");
+  const overlayEl        = qs("#tn-detail-overlay");
+  const overlayBack      = qs("#tn-overlay-back");
+  const overlayTitle     = qs("#tn-overlay-title");
+  const overlayBody      = qs("#tn-overlay-body");
 
   /* ── 狀態 ── */
-  let currentTour     = "all";
-  let liveCleanup     = null;
+  let currentTour = "all";
+  let liveCleanup = null;
 
   /* ─────────────────── 篩選器 ─────────────────── */
   function buildFilters() {
@@ -24,7 +22,6 @@ export function initTournamentModule({ tournamentService, notify }) {
         ${t.label}
       </button>
     `).join("");
-
     filterBarEl.querySelectorAll(".tour-filter-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         currentTour = btn.dataset.tour;
@@ -39,14 +36,11 @@ export function initTournamentModule({ tournamentService, notify }) {
     tournamentGridEl.innerHTML = '<p class="hint">載入中…</p>';
     try {
       const tournaments = await tournamentService.fetchTournaments({ tour: currentTour });
-
       if (tournaments.length === 0) {
         tournamentGridEl.innerHTML = '<p class="hint">此分類目前無賽事資料。</p>';
         return;
       }
-
       tournamentGridEl.innerHTML = tournaments.map((t) => tournamentCardHTML(t)).join("");
-
       tournamentGridEl.querySelectorAll(".tournament-card").forEach((card) => {
         card.addEventListener("click", () => openDetail(card.dataset.tid));
         card.addEventListener("keydown", (e) => {
@@ -59,13 +53,11 @@ export function initTournamentModule({ tournamentService, notify }) {
   }
 
   function tournamentCardHTML(t) {
-    const statusBadge = statusBadgeHTML(t.status);
     return `
       <article class="tournament-card" data-tid="${t.id}" tabindex="0" role="button"
                aria-label="查看 ${t.name} 詳情">
         <div class="tournament-card__banner">
-          <div class="tournament-card__banner-bg"
-               style="background: ${t.gradient};"></div>
+          <div class="tournament-card__banner-bg" style="background: ${t.gradient};"></div>
           <div class="tournament-card__banner-overlay"></div>
           <span class="tournament-card__tier ${t.tier.includes("Grand Slam") ? "is-grand-slam" : ""}">
             ${t.tier.includes("Grand Slam") ? "★ " : ""}${t.tier.split("/")[0].trim()}
@@ -79,7 +71,7 @@ export function initTournamentModule({ tournamentService, notify }) {
             <span>📅 ${t.dates}</span>
           </div>
           <div class="tournament-card__status">
-            ${statusBadge}
+            ${statusBadgeHTML(t.status)}
             <span class="badge" style="font-size:0.72rem;">💰 ${t.prize}</span>
           </div>
         </div>
@@ -87,52 +79,48 @@ export function initTournamentModule({ tournamentService, notify }) {
     `;
   }
 
-  function statusBadgeHTML(status) {
-    if (status === "live")      return '<span class="badge-live">LIVE</span>';
-    if (status === "upcoming")  return '<span class="badge-upcoming">即將開賽</span>';
-    return '<span class="badge-completed">已結束</span>';
-  }
-
-  /* ─────────────────── 詳情頁 ─────────────────── */
+  /* ─────────────────── 詳情 Overlay ─────────────────── */
   async function openDetail(tournamentId) {
-    listViewEl.classList.remove("is-active");
-    detailViewEl.classList.add("is-open");
-    detailViewEl.innerHTML = `
-      <div class="card" style="text-align:center; padding:2rem;">
-        <p class="hint">載入賽事詳情中…</p>
-      </div>`;
+    overlayTitle.textContent = "載入中…";
+    overlayBody.innerHTML = `<div style="text-align:center; padding:3rem;"><p class="hint">載入賽事詳情中…</p></div>`;
+    overlayEl.classList.add("is-open");
+    overlayEl.scrollTop = 0;
+    document.body.style.overflow = "hidden";
 
     try {
       const t = await tournamentService.fetchTournamentDetail(tournamentId);
       if (!t) {
-        detailViewEl.innerHTML = `<div class="card"><p class="hint">找不到賽事資訊。</p></div>`;
+        overlayBody.innerHTML = `<p class="hint">找不到賽事資訊。</p>`;
         return;
       }
+      overlayTitle.textContent = t.name;
       renderDetail(t);
     } catch (err) {
-      detailViewEl.innerHTML = `<div class="card"><p class="hint" style="color:#c0392b;">載入失敗：${err.message}</p></div>`;
+      overlayBody.innerHTML = `<p class="hint" style="color:#c0392b;">載入失敗：${err.message}</p>`;
     }
   }
 
-  function renderDetail(t) {
-    detailViewEl.innerHTML = `
-      <!-- 返回按鈕 -->
-      <div class="gear-detail-header" style="margin-bottom:0.5rem;">
-        <button class="btn-secondary gear-back-btn" id="tn-back-btn-inner" type="button">← 返回賽事列表</button>
-        <span class="badge ${t.status === "live" ? "" : ""}">${statusBadgeHTML(t.status)}</span>
-      </div>
+  function closeDetail() {
+    liveCleanup?.();
+    liveCleanup = null;
+    overlayEl.classList.remove("is-open");
+    document.body.style.overflow = "";
+  }
 
+  function renderDetail(t) {
+    overlayBody.innerHTML = `
       <!-- Banner -->
       <div class="tournament-detail__banner" style="background: ${t.gradient};">
-        <div style="position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,10,30,0.15) 0%, rgba(0,20,60,0.70) 100%);"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,10,30,0.15) 0%,rgba(0,20,60,0.72) 100%);"></div>
         <div class="tournament-detail__content">
           <h2 class="tournament-detail__title">${t.emoji} ${t.nameFull}</h2>
           <p class="tournament-detail__subtitle">${t.location} &nbsp;·&nbsp; ${t.surface}</p>
+          ${statusBadgeHTML(t.status)}
         </div>
       </div>
 
       <!-- 資訊格線 -->
-      <div class="card">
+      <div class="card" style="margin-top:1.2rem;">
         <dl class="tournament-info-grid">
           <div class="tournament-info-block"><dt>日期</dt><dd>${t.dates}</dd></div>
           <div class="tournament-info-block"><dt>場地</dt><dd>${t.surface}</dd></div>
@@ -141,126 +129,158 @@ export function initTournamentModule({ tournamentService, notify }) {
           ${t.draws.ms ? `<div class="tournament-info-block"><dt>男單籤位</dt><dd>${t.draws.ms} 籤</dd></div>` : ""}
           ${t.draws.ws ? `<div class="tournament-info-block"><dt>女單籤位</dt><dd>${t.draws.ws} 籤</dd></div>` : ""}
         </dl>
-        <p style="line-height:1.65; color:var(--ink); margin:0.6rem 0 0;">${t.description}</p>
+        <p style="line-height:1.65;color:var(--ink);margin-top:0.8rem;">${t.description}</p>
       </div>
 
-      <!-- 冠軍區塊 -->
+      <!-- 冠軍 -->
+      ${t.status !== "upcoming" ? `
       <div class="card">
-        <h3 style="margin-bottom:0.7rem;">🏆 冠軍</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.7rem;">
-          <div class="gear-spec-item">
-            <dt>男子單打</dt>
-            <dd>${t.champions.ms}</dd>
-          </div>
-          <div class="gear-spec-item">
-            <dt>女子單打</dt>
-            <dd>${t.champions.ws}</dd>
-          </div>
+        <h3 style="margin-bottom:0.8rem;">🏆 冠軍</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;">
+          <div class="gear-spec-item"><dt>男子單打</dt><dd>${escHtml(t.champions.ms)}</dd></div>
+          <div class="gear-spec-item"><dt>女子單打</dt><dd>${escHtml(t.champions.ws)}</dd></div>
         </div>
       </div>
+      ` : ""}
 
-      <!-- 實況 / 分數區塊（API/SCRAPER STUB） -->
-      ${liveStubHTML(t)}
+      <!-- 對戰 / 比分 -->
+      <div class="card">
+        <h3 style="margin-bottom:0.8rem;">${t.status === "live" ? "🔴 即時賽況" : t.status === "completed" ? "📋 對戰結果" : "📋 預計對戰"}</h3>
+        ${matchesHTML(t)}
+      </div>
+
+      <!-- Live scores container -->
+      ${t.liveEnabled ? `<div id="tn-live-scores"></div>` : ""}
     `;
 
-    qs("#tn-back-btn-inner").addEventListener("click", closeDetail);
-
-    /* 如果此賽事啟用 live，訂閱即時分數 */
     if (t.liveEnabled) {
       liveCleanup?.();
       liveCleanup = tournamentService.subscribeLiveScores(t.id, (scores) => {
-        /* [API HOOK] 收到即時分數後更新 #tn-live-scores */
-        const liveContainer = qs("#tn-live-scores");
-        if (liveContainer) {
-          liveContainer.innerHTML = scores
+        const el = qs("#tn-live-scores");
+        if (el) {
+          el.innerHTML = scores
             .map((s) => `<div class="list-item">${escHtml(JSON.stringify(s))}</div>`)
-            .join("") || "<p class='hint'>暫無進行中比賽</p>";
+            .join("") || "";
         }
       });
     }
   }
 
-  function liveStubHTML(t) {
-    if (t.status === "upcoming") {
-      return `
-        <div class="live-stub-banner">
-          <div class="live-stub-title">📡 實況與籤表</div>
-          <p class="live-stub-desc">
-            此賽事尚未開賽（${t.dates}）。開賽後系統將自動串接即時比分與籤表資料。
-          </p>
-          <div class="live-stub-hooks">
-            <span class="hook-tag">fetchTournaments()</span>
-            <span class="hook-tag">fetchTournamentDetail()</span>
-            <span class="hook-tag">subscribeLiveScores()</span>
-          </div>
-        </div>
-      `;
+  /* ─────────────────── 對戰卡片 ─────────────────── */
+  function matchesHTML(t) {
+    const matches = t.matches ?? [];
+    if (matches.length === 0) {
+      return `<p class="hint" style="text-align:center;padding:1rem;">籤表資料尚未公布</p>`;
     }
-    if (t.status === "completed") {
-      return `
-        <div class="live-stub-banner" style="background: linear-gradient(120deg, #1a2a1a 0%, #2a4a2a 50%, #3a6a3a 100%);">
-          <div class="live-stub-title">✅ 賽事已結束</div>
-          <p class="live-stub-desc">
-            可串接官方 API 或歷史資料庫取得完整對戰記錄、統計數據與籤表。
-          </p>
-          <div class="live-stub-hooks">
-            <span class="hook-tag">fetchTournamentDetail()</span>
-            <span class="hook-tag">ATP/WTA Historical API</span>
-            <span class="hook-tag">triggerScrape()</span>
-          </div>
-        </div>
-      `;
-    }
-    /* status === "live" */
+
+    /* 依 round 分組 */
+    const groups = {};
+    matches.forEach((m) => {
+      if (!groups[m.round]) groups[m.round] = [];
+      groups[m.round].push(m);
+    });
+
+    return Object.entries(groups).map(([round, ms]) => `
+      <div class="match-group">
+        <div class="match-group__label">${round}</div>
+        ${ms.map((m) => matchCardHTML(m)).join("")}
+      </div>
+    `).join("");
+  }
+
+  function matchCardHTML(m) {
+    const isLive      = m.status === "live";
+    const isCompleted = m.status === "completed";
+    const isScheduled = m.status === "scheduled";
+
+    const p1Win = m.winner === "p1";
+    const p2Win = m.winner === "p2";
+
+    const setsScore = isScheduled ? "—" : m.sets.map((s, i) => {
+      const p1score = s.p1 ?? "—";
+      const p2score = s.p2 ?? "—";
+      return `<span class="match-set ${i === m.sets.length - 1 && isLive ? "is-current" : ""}">${p1score}—${p2score}</span>`;
+    }).join(" ");
+
     return `
-      <div class="live-stub-banner">
-        <div class="live-stub-title">
-          <span class="badge-live" style="font-size:0.9rem;">LIVE</span>
-          即時比分
+      <div class="match-card ${isLive ? "is-live" : ""}">
+        ${isLive ? `<div class="match-live-badge"><span class="badge-live">LIVE</span></div>` : ""}
+        ${isScheduled ? `<div class="match-time-label">🕐 ${m.time}</div>` : ""}
+
+        <div class="match-players">
+          <div class="match-player ${p1Win ? "is-winner" : ""}">
+            ${avatarHTML(m.player1, p1Win)}
+            <div class="match-player__info">
+              <span class="match-player__name">${escHtml(m.player1.name)}</span>
+              <span class="match-player__nat">${m.player1.flag} ${escHtml(m.player1.nationality)}</span>
+            </div>
+            ${p1Win ? `<span class="match-winner-crown">🏆</span>` : ""}
+          </div>
+
+          <div class="match-vs-col">
+            <span class="match-vs">VS</span>
+            <div class="match-score-col">
+              ${isScheduled ? `<span class="match-tbd">待賽</span>` :
+                isLive ? `<div class="match-live-score">
+                  <div>${escHtml(m.liveScore?.p1 ?? "—")}</div>
+                  <div>${escHtml(m.liveScore?.p2 ?? "—")}</div>
+                </div>` : ""}
+            </div>
+          </div>
+
+          <div class="match-player ${p2Win ? "is-winner" : ""} is-right">
+            ${p2Win ? `<span class="match-winner-crown">🏆</span>` : ""}
+            <div class="match-player__info is-right">
+              <span class="match-player__name">${escHtml(m.player2.name)}</span>
+              <span class="match-player__nat">${m.player2.flag} ${escHtml(m.player2.nationality)}</span>
+            </div>
+            ${avatarHTML(m.player2, p2Win)}
+          </div>
         </div>
-        <p class="live-stub-desc">
-          即時比分功能已預留 API 接口（subscribeLiveScores）。串接 WebSocket 或輪詢 API 後，
-          比分將自動更新顯示於下方區塊。
-        </p>
-        <div class="live-stub-hooks">
-          <span class="hook-tag">subscribeLiveScores(id, callback)</span>
-          <span class="hook-tag">WebSocket / 30s polling</span>
-          <span class="hook-tag">flashscore API</span>
-        </div>
-        <div id="tn-live-scores" style="margin-top:0.8rem;">
-          <p style="color:rgba(255,255,255,0.6); font-size:0.85rem;">等待即時資料連線中…</p>
-        </div>
+
+        ${!isScheduled ? `<div class="match-sets">${setsScore}</div>` : ""}
+        ${isLive && m.liveScore?.currentGame ? `
+          <div class="match-current-game">
+            目前局分：${escHtml(m.liveScore.currentGame.p1)} — ${escHtml(m.liveScore.currentGame.p2)}
+          </div>` : ""}
+        <div class="match-court">🏟️ ${escHtml(m.court)}</div>
       </div>
     `;
   }
 
-  function closeDetail() {
-    liveCleanup?.();
-    liveCleanup = null;
-    detailViewEl.classList.remove("is-open");
-    detailViewEl.innerHTML = "";
-    listViewEl.classList.add("is-active");
+  function avatarHTML(player, isWinner) {
+    return `
+      <div class="player-avatar" style="background:${player.color};" title="${escHtml(player.name)}">
+        ${escHtml(player.initials)}
+      </div>
+    `;
+  }
+
+  /* ─────────────────── Helpers ─────────────────── */
+  function statusBadgeHTML(status) {
+    if (status === "live")      return '<span class="badge-live">LIVE</span>';
+    if (status === "upcoming")  return '<span class="badge-upcoming">即將開賽</span>';
+    if (status === "scheduled") return '<span class="badge-upcoming">待賽</span>';
+    return '<span class="badge-completed">已結束</span>';
   }
 
   function escHtml(str) {
-    return String(str)
+    return String(str ?? "")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
   }
 
   /* ─────────────────── 初始化 ─────────────────── */
-  backBtn.addEventListener("click", closeDetail);
+  overlayBack.addEventListener("click", closeDetail);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && overlayEl.classList.contains("is-open")) closeDetail();
+  });
 
   buildFilters();
   renderGrid();
-  listViewEl.classList.add("is-active");
 
   return {
-    refresh() {
-      if (!detailViewEl.classList.contains("is-open")) {
-        renderGrid();
-      }
-    },
+    refresh() { renderGrid(); },
   };
 }
