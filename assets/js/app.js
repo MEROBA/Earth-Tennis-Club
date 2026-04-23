@@ -4,11 +4,15 @@ import { initMatchingModule } from "./modules/matching-module.js";
 import { initCourtsModule } from "./modules/courts-module.js";
 import { initForumModule } from "./modules/forum-module.js";
 import { initInviteModule } from "./modules/invite-module.js";
+import { initEquipmentModule } from "./modules/equipment-module.js";
+import { initTournamentModule } from "./modules/tournament-module.js";
 import { createApiService } from "./services/api-service.js";
 import { createCourtService } from "./services/court-service.js";
 import { createForumService } from "./services/forum-service.js";
 import { createMemberService } from "./services/member-service.js";
 import { createInviteService } from "./services/invite-service.js";
+import { createEquipmentService } from "./services/equipment-service.js";
+import { createTournamentService } from "./services/tournament-service.js";
 import { createRateLimiter } from "./services/security-service.js";
 import { createStorageService } from "./services/storage-service.js";
 import { qsa } from "./ui/dom.js";
@@ -21,6 +25,8 @@ const memberService = createMemberService(storage, api);
 const courtService = createCourtService(storage, api);
 const forumService = createForumService(storage, api);
 const inviteService = createInviteService(storage);
+const equipmentService = createEquipmentService(storage);
+const tournamentService = createTournamentService();
 
 const toast = document.querySelector("#toast");
 const chip = document.querySelector("#api-mode-chip");
@@ -97,6 +103,17 @@ forumModule = initForumModule({
   memberService,
   rateLimiter,
   postLimit: APP_CONFIG.security.postPerMinute,
+  notify,
+});
+
+initEquipmentModule({
+  equipmentService,
+  memberService,
+  notify,
+});
+
+initTournamentModule({
+  tournamentService,
   notify,
 });
 

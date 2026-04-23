@@ -62,6 +62,8 @@
       <button class="tab-button" data-view="invite">約打球</button>
       <button class="tab-button" data-view="courts">全台球場</button>
       <button class="tab-button" data-view="forum">交流區</button>
+      <button class="tab-button" data-view="equipment">運動裝備</button>
+      <button class="tab-button" data-view="tournament">賽事資訊</button>
       <button class="tab-button" data-view="security">架構與資安</button>
     </nav>
 
@@ -301,6 +303,66 @@
             </div>
             <div id="forum-posts" class="list"></div>
           </div>
+        </div>
+      </section>
+
+      <!-- 運動裝備 -->
+      <section class="view" id="view-equipment" data-view="equipment">
+        <div class="card">
+          <div class="tournament-header-row">
+            <h2 style="margin:0;">運動裝備</h2>
+            <span class="data-source-notice">資料來源：編輯部精選 · 持續更新</span>
+          </div>
+          <p class="hint" style="margin-bottom:0.8rem;">
+            精選網球拍、球鞋、球包等裝備介紹，點擊裝備卡查看完整規格，並在下方留下你的使用心得與星評。
+          </p>
+
+          <!-- 分類 Tabs -->
+          <div class="gear-category-tabs" id="eq-category-tabs" role="tablist" aria-label="裝備分類"></div>
+
+          <!-- 裝備列表 / 詳情 切換容器 -->
+          <div id="eq-list-view">
+            <div class="gear-grid" id="eq-gear-grid"></div>
+          </div>
+
+          <!-- 裝備詳情（預設隱藏） -->
+          <div id="eq-detail-view" class="gear-detail">
+            <div class="gear-detail-header" style="margin-bottom:0.6rem;">
+              <button class="btn-secondary gear-back-btn" id="eq-back-btn" type="button">← 返回裝備列表</button>
+            </div>
+            <div id="eq-detail-header"></div>
+            <div id="eq-review-section"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 賽事資訊 -->
+      <section class="view" id="view-tournament" data-view="tournament">
+        <div class="card">
+          <div class="tournament-header-row">
+            <h2 style="margin:0;">賽事資訊</h2>
+            <span class="data-source-notice">
+              🔌 API / 爬蟲接口已預留 &nbsp;·&nbsp; 目前顯示 Mock 資料
+            </span>
+          </div>
+          <p class="hint" style="margin-bottom:0.8rem;">
+            全球各大網球賽事一覽，包含大滿貫、ATP / WTA Masters 與亞洲重點賽事。
+            點擊賽事卡可查看詳細資訊、籤表與即時比分（實況功能待串接）。
+          </p>
+
+          <!-- 巡迴賽篩選 -->
+          <div class="tournament-filters" id="tn-filter-bar" role="tablist" aria-label="賽事篩選"></div>
+
+          <!-- 列表 / 詳情切換 -->
+          <div id="tn-list-view">
+            <div class="tournament-grid" id="tn-tournament-grid"></div>
+          </div>
+
+          <!-- 詳情（動態插入） -->
+          <div id="tn-detail-view" class="tournament-detail"></div>
+
+          <!-- 隱藏的返回按鈕（供 module 綁定初始事件，避免 DOM 未就緒） -->
+          <button id="tn-back-btn" type="button" style="display:none;" aria-hidden="true">返回</button>
         </div>
       </section>
 
