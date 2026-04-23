@@ -1,0 +1,216 @@
+/* 靜態裝備資料 — 網球拍、球鞋、球包 */
+
+export const EQUIPMENT_CATEGORIES = Object.freeze([
+  { id: "all",    label: "全部" },
+  { id: "racket", label: "🎾 網球拍" },
+  { id: "shoes",  label: "👟 球鞋" },
+  { id: "bag",    label: "🎒 球包" },
+]);
+
+export const EQUIPMENT_LIST = Object.freeze([
+  /* ── 網球拍 ── */
+  {
+    id: "r001",
+    category: "racket",
+    brand: "Wilson",
+    name: "Pro Staff 97 v14",
+    emoji: "🎾",
+    tagline: "精準控制的傳奇之選",
+    description:
+      "Wilson Pro Staff 系列是職業球員的最愛，97 平方英寸拍面提供絕佳控球手感，配合 Braid Weave 編織技術讓球拍手感更加靈敏。適合底線型或技術型球員。",
+    specs: [
+      { label: "拍面", value: "97 in²" },
+      { label: "重量", value: "315g（穿線）" },
+      { label: "拍框厚度", value: "21.5mm" },
+      { label: "平衡", value: "6 pt HL" },
+      { label: "穿線張力", value: "50–60 lbs" },
+      { label: "適合程度", value: "中進階 – 職業" },
+    ],
+    price: "NT$ 6,800",
+    gradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+  },
+  {
+    id: "r002",
+    category: "racket",
+    brand: "Babolat",
+    name: "Pure Aero 2024",
+    emoji: "🎾",
+    tagline: "旋轉之王，Rafa 的武器",
+    description:
+      "Babolat Pure Aero 以強大旋轉生成著稱，2024 版本採用 FSI Power 技術優化了弦間距，配合 AeroModular 拍框設計大幅提升揮拍速度。適合底線球員與喜愛重上旋的選手。",
+    specs: [
+      { label: "拍面", value: "100 in²" },
+      { label: "重量", value: "300g（穿線）" },
+      { label: "拍框厚度", value: "23–26mm" },
+      { label: "平衡", value: "3 pt HL" },
+      { label: "穿線張力", value: "50–59 lbs" },
+      { label: "適合程度", value: "中級 – 進階" },
+    ],
+    price: "NT$ 7,200",
+    gradient: "linear-gradient(135deg, #ffd700 0%, #ffa500 50%, #cc6600 100%)",
+  },
+  {
+    id: "r003",
+    category: "racket",
+    brand: "Head",
+    name: "Speed MP 2024",
+    emoji: "🎾",
+    tagline: "速度與控制的完美平衡",
+    description:
+      "Head Speed MP 是 Novak Djokovic 簽名款系列，採用 Graphene 360+ 技術分散衝擊力，兼顧速度與穩定性。100 平方英寸的拍面對各類型球員都相當友善。",
+    specs: [
+      { label: "拍面", value: "100 in²" },
+      { label: "重量", value: "300g（穿線）" },
+      { label: "拍框厚度", value: "23mm" },
+      { label: "平衡", value: "3 pt HL" },
+      { label: "穿線張力", value: "52–62 lbs" },
+      { label: "適合程度", value: "中級 – 進階" },
+    ],
+    price: "NT$ 6,500",
+    gradient: "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #4a4a4a 100%)",
+  },
+  {
+    id: "r004",
+    category: "racket",
+    brand: "Yonex",
+    name: "EZONE 98 (2023)",
+    emoji: "🎾",
+    tagline: "舒適感拍框首選",
+    description:
+      "Yonex EZONE 系列以卓越的震動吸收性能聞名，等距穿線技術（Isometric）擴大甜蜜點面積達 7%。適合追求舒適手感並減少手臂受傷風險的球員。",
+    specs: [
+      { label: "拍面", value: "98 in²" },
+      { label: "重量", value: "305g（穿線）" },
+      { label: "拍框厚度", value: "23mm" },
+      { label: "平衡", value: "5 pt HL" },
+      { label: "穿線張力", value: "40–60 lbs" },
+      { label: "適合程度", value: "中級 – 進階" },
+    ],
+    price: "NT$ 6,200",
+    gradient: "linear-gradient(135deg, #003080 0%, #0055cc 50%, #0088ff 100%)",
+  },
+
+  /* ── 球鞋 ── */
+  {
+    id: "s001",
+    category: "shoes",
+    brand: "Nike",
+    name: "Court Air Zoom Vapor Pro 2",
+    emoji: "👟",
+    tagline: "輕量、快速、澳網官方合作款",
+    description:
+      "Nike Court Air Zoom Vapor Pro 2 是專業選手的競技選擇，中足 Zoom Air 氣墊提供優異緩震，橡膠外底針對硬地優化耐磨度。2026 年澳網多位球星皆穿此款上場。",
+    specs: [
+      { label: "適用場地", value: "硬地（Hard Court）" },
+      { label: "緩震技術", value: "Zoom Air" },
+      { label: "外底材質", value: "耐磨橡膠（HC）" },
+      { label: "鞋面", value: "網格 + TPU 骨架" },
+      { label: "重量", value: "約 350g（US10）" },
+      { label: "保固", value: "6 個月外底磨損保固" },
+    ],
+    price: "NT$ 4,800",
+    gradient: "linear-gradient(135deg, #ff4500 0%, #cc2200 50%, #880000 100%)",
+  },
+  {
+    id: "s002",
+    category: "shoes",
+    brand: "Asics",
+    name: "Gel-Resolution 9",
+    emoji: "👟",
+    tagline: "長時間比賽的頂尖穩定性",
+    description:
+      "Asics Gel-Resolution 9 以卓越的橫向穩定支撐著稱，後跟 Gel 緩震系統有效吸收落地衝擊，PGuard 鞋頭保護設計防止拖拉磨損。WTA 與 ATP 球員長賽必備。",
+    specs: [
+      { label: "適用場地", value: "硬地 / 紅土" },
+      { label: "緩震技術", value: "Gel（後跟）" },
+      { label: "穩定技術", value: "Trusstic + DuoMax" },
+      { label: "保護", value: "PGuard 鞋頭" },
+      { label: "重量", value: "約 385g（US10）" },
+      { label: "保固", value: "6 個月外底磨損保固" },
+    ],
+    price: "NT$ 4,200",
+    gradient: "linear-gradient(135deg, #003366 0%, #006699 50%, #0099cc 100%)",
+  },
+  {
+    id: "s003",
+    category: "shoes",
+    brand: "New Balance",
+    name: "Fresh Foam Lav v2",
+    emoji: "👟",
+    tagline: "澳網 x NB 頂級緩震體驗",
+    description:
+      "New Balance Fresh Foam Lav v2 採用全掌 Fresh Foam X 中底，為硬地球員提供極佳緩震舒適度，NDurance 橡膠外底耐磨配方專為網球設計。適合長時間練習及比賽使用。",
+    specs: [
+      { label: "適用場地", value: "全場地（偏硬地）" },
+      { label: "中底", value: "Fresh Foam X" },
+      { label: "外底", value: "NDurance 橡膠" },
+      { label: "鞋面", value: "合成皮革 + 網格" },
+      { label: "重量", value: "約 368g（US10）" },
+      { label: "保固", value: "6 個月外底磨損保固" },
+    ],
+    price: "NT$ 3,900",
+    gradient: "linear-gradient(135deg, #ff6600 0%, #cc4400 50%, #882200 100%)",
+  },
+
+  /* ── 球包 ── */
+  {
+    id: "b001",
+    category: "bag",
+    brand: "Wilson",
+    name: "Super Tour 15 Pack",
+    emoji: "🎒",
+    tagline: "職業球員最大容量選擇",
+    description:
+      "Wilson Super Tour 15 Pack 可容納最多 15 支球拍，配備獨立鞋袋及多層收納隔間。恆溫收納夾層有效保護球拍線材免受高溫損壞。符合 ATP / WTA 巡迴賽場地規格。",
+    specs: [
+      { label: "容量", value: "最多 15 支球拍" },
+      { label: "恆溫夾層", value: "有" },
+      { label: "鞋袋", value: "獨立鞋袋" },
+      { label: "背帶", value: "可調節肩背 + 手提" },
+      { label: "尺寸", value: "約 75 × 36 × 32cm" },
+      { label: "材質", value: "高耐磨 Polyester" },
+    ],
+    price: "NT$ 3,600",
+    gradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+  },
+  {
+    id: "b002",
+    category: "bag",
+    brand: "Head",
+    name: "Tour Team 9R Supercombi",
+    emoji: "🎒",
+    tagline: "兼顧背包 + 拍袋的多用途設計",
+    description:
+      "Head Tour Team Supercombi 整合了球拍袋與後背包的功能，可同時容納 9 支球拍並備有獨立電腦夾層。Climate Control Technology 溫控系統保護球拍在高溫下不受損。",
+    specs: [
+      { label: "容量", value: "最多 9 支球拍" },
+      { label: "溫控", value: "CCT（Climate Control Tech）" },
+      { label: "電腦夾層", value: "15\" 筆電隔層" },
+      { label: "背帶", value: "後背 + 單肩兩用" },
+      { label: "尺寸", value: "約 77 × 35 × 28cm" },
+      { label: "材質", value: "600D Polyester" },
+    ],
+    price: "NT$ 2,800",
+    gradient: "linear-gradient(135deg, #1a1a1a 0%, #333 50%, #555 100%)",
+  },
+  {
+    id: "b003",
+    category: "bag",
+    brand: "Babolat",
+    name: "Pure Aero RH X6",
+    emoji: "🎒",
+    tagline: "輕量競技款，比賽首選",
+    description:
+      "Babolat Pure Aero RH X6 輕巧設計適合日常訓練與小型比賽，6 支球拍容量搭配獨立濕衣袋及水壺側袋。符合 Roland Garros 官方球員包款設計語言。",
+    specs: [
+      { label: "容量", value: "最多 6 支球拍" },
+      { label: "濕衣袋", value: "獨立防水袋" },
+      { label: "水壺袋", value: "雙側水壺口袋" },
+      { label: "背帶", value: "可調節肩背" },
+      { label: "尺寸", value: "約 72 × 30 × 28cm" },
+      { label: "材質", value: "600D Polyester + PVC" },
+    ],
+    price: "NT$ 1,980",
+    gradient: "linear-gradient(135deg, #ffd700 0%, #cc8800 50%, #996600 100%)",
+  },
+]);

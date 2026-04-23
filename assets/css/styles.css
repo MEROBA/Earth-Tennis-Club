@@ -1,19 +1,48 @@
+/* ─────────────────────────────────────────────
+   Earth Tennis Club — AO 2026 Blue-White Theme
+   ───────────────────────────────────────────── */
 :root {
-  --bg-0: #040b16;
-  --bg-1: #0a1730;
-  --bg-2: #0f2d59;
-  --surface: rgba(10, 24, 46, 0.88);
-  --surface-strong: #10284a;
-  --surface-soft: rgba(12, 32, 62, 0.78);
-  --ink: #f2f8ff;
-  --muted: #9fb4d3;
-  --primary: #00a8ff;
-  --primary-strong: #006cc4;
-  --accent: #d5ff2f;
-  --accent-soft: rgba(213, 255, 47, 0.15);
-  --border: rgba(163, 192, 235, 0.24);
-  --line: rgba(213, 255, 47, 0.24);
-  --shadow: 0 16px 44px rgba(0, 0, 0, 0.38);
+  /* AO 2026 palette — inspired by 2026 Australian Open */
+  --ao-navy:    #00143A;
+  --ao-deep:    #001F5C;
+  --ao-royal:   #0047A0;
+  --ao-blue:    #0066CC;
+  --ao-sky:     #008FD8;
+  --ao-cyan:    #00C2E8;
+  --ao-aqua:    #00D9F0;
+  --ao-light:   #EBF5FF;
+  --ao-pale:    #F5FAFE;
+  --ao-white:   #FFFFFF;
+
+  /* Semantic tokens */
+  --bg-0: var(--ao-navy);
+  --bg-1: var(--ao-royal);
+  --bg-2: var(--ao-blue);
+
+  --surface:        rgba(255, 255, 255, 0.98);
+  --surface-strong: #f0f8ff;
+  --surface-soft:   rgba(235, 245, 255, 0.96);
+
+  --ink:            #00143A;
+  --ink-on-dark:    #ffffff;
+  --muted:          #3D6080;
+  --muted-on-dark:  #93CCE8;
+
+  --primary:        #0047A0;
+  --primary-strong: #003080;
+  --accent:         #00C2E8;
+  --accent-strong:  #00A8D4;
+  --accent-soft:    rgba(0, 194, 232, 0.13);
+
+  --star-gold:      #FFB800;
+  --star-empty:     #C8DCF0;
+
+  --border:         rgba(0, 71, 160, 0.14);
+  --border-hero:    rgba(255, 255, 255, 0.20);
+  --line:           rgba(0, 194, 232, 0.26);
+  --shadow:         0 8px 32px rgba(0, 30, 100, 0.09);
+  --shadow-lg:      0 16px 48px rgba(0, 20, 80, 0.14);
+  --shadow-hero:    0 20px 56px rgba(0, 10, 40, 0.38);
   --radius: 16px;
 }
 
@@ -27,20 +56,22 @@ body {
   color: var(--ink);
   font-family: "Noto Sans TC", sans-serif;
   background:
-    radial-gradient(circle at 12% 18%, rgba(0, 168, 255, 0.18), transparent 38%),
-    radial-gradient(circle at 88% 82%, rgba(213, 255, 47, 0.14), transparent 42%),
-    linear-gradient(140deg, var(--bg-0), var(--bg-1) 48%, var(--bg-2));
+    radial-gradient(ellipse at 8% 12%, rgba(0, 194, 232, 0.12), transparent 38%),
+    radial-gradient(ellipse at 92% 88%, rgba(0, 71, 160, 0.11), transparent 42%),
+    radial-gradient(ellipse at 50% 0%, rgba(0, 102, 204, 0.07), transparent 55%),
+    linear-gradient(158deg, #eef7ff 0%, #dceeff 40%, #c8e2ff 75%, #b8d8ff 100%);
   padding: 1.75rem clamp(1rem, 4vw, 3rem) 2.8rem;
   position: relative;
   overflow-x: hidden;
 }
 
+/* ── Background Decoration ── */
 .court-lines {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: -3;
-  opacity: 0.7;
+  opacity: 0.55;
 }
 
 .court-lines::before,
@@ -76,33 +107,30 @@ body {
   filter: blur(60px);
   pointer-events: none;
   z-index: -2;
-  opacity: 0.3;
+  opacity: 0.22;
   animation: orb 12s ease-in-out infinite;
 }
 
 .glow-left {
   left: -12vw;
   top: -8vw;
-  background: radial-gradient(circle, rgba(0, 168, 255, 0.8), transparent 70%);
+  background: radial-gradient(circle, rgba(0, 180, 232, 0.9), transparent 70%);
 }
 
 .glow-right {
   right: -12vw;
   bottom: -12vw;
-  background: radial-gradient(circle, rgba(213, 255, 47, 0.8), transparent 70%);
+  background: radial-gradient(circle, rgba(0, 87, 204, 0.9), transparent 70%);
   animation-delay: 5s;
 }
 
 @keyframes orb {
   0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.12);
-  }
+  100% { transform: scale(1); }
+  50%   { transform: scale(1.12); }
 }
 
+/* ── Site Header (dark AO navy) ── */
 .site-header {
   display: grid;
   grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr);
@@ -112,22 +140,25 @@ body {
 
 .hero-copy,
 .hero-panel {
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-hero);
   border-radius: calc(var(--radius) + 2px);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(4px);
+  box-shadow: var(--shadow-hero);
+  backdrop-filter: blur(6px);
+  color: var(--ink-on-dark);
 }
 
 .hero-copy {
   background:
-    linear-gradient(128deg, rgba(0, 168, 255, 0.16), transparent 45%),
-    linear-gradient(180deg, rgba(16, 40, 74, 0.95), rgba(8, 20, 40, 0.92));
+    linear-gradient(135deg, rgba(0, 194, 232, 0.22), transparent 40%),
+    linear-gradient(200deg, rgba(0, 217, 240, 0.08) 0%, transparent 35%),
+    linear-gradient(168deg, var(--ao-navy) 0%, #00266A 50%, var(--ao-royal) 100%);
   padding: clamp(1rem, 3vw, 1.8rem);
 }
 
 .hero-panel {
   background:
-    linear-gradient(180deg, rgba(16, 40, 74, 0.94), rgba(8, 20, 40, 0.9));
+    linear-gradient(155deg, rgba(0, 194, 232, 0.15), transparent 45%),
+    linear-gradient(168deg, var(--ao-navy) 0%, #002060 55%, var(--ao-royal) 100%);
   padding: 0.9rem;
   display: grid;
   align-content: start;
@@ -136,7 +167,7 @@ body {
 
 .eyebrow {
   margin: 0;
-  color: var(--accent);
+  color: var(--ao-cyan);
   font-family: "Barlow Condensed", sans-serif;
   text-transform: uppercase;
   font-size: 0.95rem;
@@ -157,27 +188,30 @@ h1 {
   line-height: 0.95;
   text-transform: uppercase;
   margin-top: 0.35rem;
+  color: var(--ink-on-dark);
 }
 
 h1 span {
-  color: var(--accent);
+  color: var(--ao-cyan);
 }
 
 h2 {
   font-size: clamp(1.35rem, 3.5vw, 1.85rem);
   margin-bottom: 0.58rem;
   text-transform: uppercase;
+  color: var(--ink);
 }
 
 h3 {
   font-size: 1.25rem;
   text-transform: uppercase;
+  color: var(--ink);
 }
 
 .subtitle {
   margin: 0.8rem 0 0;
   max-width: 58ch;
-  color: #d8e6fb;
+  color: rgba(200, 225, 255, 0.9);
 }
 
 .hero-tags {
@@ -188,9 +222,9 @@ h3 {
 }
 
 .hero-tags span {
-  border: 1px solid rgba(213, 255, 47, 0.45);
-  color: #e9ff89;
-  background: rgba(213, 255, 47, 0.09);
+  border: 1px solid rgba(0, 180, 232, 0.55);
+  color: #a8e8ff;
+  background: rgba(0, 180, 232, 0.12);
   border-radius: 999px;
   padding: 0.2rem 0.6rem;
   font-size: 0.75rem;
@@ -199,9 +233,9 @@ h3 {
 .status-chip {
   justify-self: end;
   border-radius: 999px;
-  border: 1px solid rgba(0, 168, 255, 0.5);
-  background: rgba(0, 168, 255, 0.12);
-  color: #a8dbff;
+  border: 1px solid rgba(0, 180, 232, 0.6);
+  background: rgba(0, 180, 232, 0.18);
+  color: #a8e8ff;
   padding: 0.34rem 0.78rem;
   font-size: 0.8rem;
   font-weight: 700;
@@ -213,24 +247,25 @@ h3 {
 }
 
 .metric {
-  border: 1px solid rgba(163, 192, 235, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   padding: 0.56rem 0.66rem;
-  background: rgba(9, 22, 43, 0.68);
+  background: rgba(0, 20, 60, 0.45);
 }
 
 .metric-value {
   font-size: 1.7rem;
-  color: var(--accent);
+  color: var(--ao-cyan);
   line-height: 0.95;
 }
 
 .metric-label {
   margin: 0.22rem 0 0;
-  color: var(--muted);
+  color: var(--muted-on-dark);
   font-size: 0.8rem;
 }
 
+/* ── Tab Navigation ── */
 .tab-nav {
   margin-top: 1rem;
   padding: 0.5rem;
@@ -239,31 +274,37 @@ h3 {
   gap: 0.52rem;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: rgba(9, 22, 43, 0.72);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 4px 18px rgba(0, 60, 160, 0.07);
 }
 
 .tab-button {
-  border: 1px solid rgba(145, 178, 224, 0.28);
+  border: 1px solid rgba(0, 87, 204, 0.22);
   border-radius: 9px;
-  background: rgba(14, 33, 62, 0.86);
-  color: #e4efff;
+  background: rgba(240, 248, 255, 0.8);
+  color: var(--primary);
   padding: 0.48rem 0.85rem;
   cursor: pointer;
+  font-weight: 500;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .tab-button:hover {
   transform: translateY(-1px);
-  border-color: rgba(213, 255, 47, 0.55);
+  border-color: var(--ao-sky);
+  background: rgba(0, 150, 224, 0.08);
 }
 
 .tab-button.is-active {
   border-color: transparent;
-  background: linear-gradient(116deg, var(--accent), #94c814 55%, #6a9500);
-  color: #0c1a2f;
+  background: linear-gradient(116deg, var(--ao-sky), var(--ao-royal) 65%);
+  color: #ffffff;
   font-weight: 700;
+  box-shadow: 0 4px 18px rgba(0, 71, 160, 0.32);
+  letter-spacing: 0.02em;
 }
 
+/* ── Main Layout ── */
 .app-main {
   margin-top: 1.1rem;
 }
@@ -278,20 +319,14 @@ h3 {
 }
 
 @keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Card ── */
 .card {
   position: relative;
-  background:
-    linear-gradient(180deg, var(--surface), rgba(7, 18, 35, 0.95));
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -307,7 +342,7 @@ h3 {
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  background: linear-gradient(90deg, transparent, var(--ao-cyan), var(--ao-blue), transparent);
 }
 
 .grid-two {
@@ -316,6 +351,7 @@ h3 {
   gap: 1rem;
 }
 
+/* ── Forms ── */
 label {
   display: grid;
   gap: 0.34rem;
@@ -333,20 +369,20 @@ button {
 input,
 select,
 textarea {
-  border: 1px solid rgba(166, 199, 244, 0.3);
+  border: 1px solid rgba(0, 87, 204, 0.22);
   border-radius: 10px;
   padding: 0.52rem 0.65rem;
-  background: rgba(7, 19, 37, 0.8);
+  background: #f8fcff;
   color: var(--ink);
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #7f98ba;
+  color: #89aace;
 }
 
 input[type="range"] {
-  accent-color: var(--accent);
+  accent-color: var(--primary);
   padding: 0;
 }
 
@@ -355,7 +391,7 @@ select:focus-visible,
 textarea:focus-visible,
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--ao-sky);
   outline-offset: 2px;
 }
 
@@ -387,6 +423,7 @@ textarea {
   min-width: 120px;
 }
 
+/* ── Buttons ── */
 .btn-primary,
 .btn-secondary {
   border-radius: 10px;
@@ -403,24 +440,36 @@ textarea {
 
 .btn-primary {
   border: 1px solid transparent;
-  color: #0c1a2f;
-  background: linear-gradient(110deg, var(--accent), #a9d61a 60%, #8fbc12);
-  box-shadow: 0 8px 20px rgba(133, 183, 17, 0.28);
+  color: #ffffff;
+  background: linear-gradient(110deg, var(--ao-sky), var(--ao-royal) 68%);
+  box-shadow: 0 6px 20px rgba(0, 71, 160, 0.30);
+  letter-spacing: 0.02em;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 10px 28px rgba(0, 71, 160, 0.42);
+  background: linear-gradient(110deg, var(--ao-cyan), var(--ao-blue) 68%);
 }
 
 .btn-secondary {
-  border: 1px solid rgba(166, 199, 244, 0.34);
-  color: #d4e5ff;
-  background: rgba(10, 28, 54, 0.95);
+  border: 1px solid rgba(0, 87, 204, 0.32);
+  color: var(--primary);
+  background: rgba(240, 248, 255, 0.9);
 }
 
+.btn-secondary:hover {
+  background: rgba(0, 150, 224, 0.08);
+  border-color: var(--ao-sky);
+}
+
+/* ── Lists ── */
 .list {
   display: grid;
   gap: 0.58rem;
 }
 
 .list-item {
-  border: 1px solid rgba(163, 192, 235, 0.24);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.62rem 0.74rem;
   background: var(--surface-soft);
@@ -431,7 +480,7 @@ textarea {
   font-family: "Barlow Condensed", sans-serif;
   font-size: 1.14rem;
   letter-spacing: 0.03em;
-  color: #eaf3ff;
+  color: var(--ao-navy);
 }
 
 .list-item p {
@@ -451,9 +500,9 @@ textarea {
   border-radius: 999px;
   padding: 0.18rem 0.56rem;
   font-size: 0.77rem;
-  border: 1px solid rgba(213, 255, 47, 0.45);
-  color: #efff9b;
-  background: rgba(213, 255, 47, 0.1);
+  border: 1px solid rgba(0, 180, 232, 0.45);
+  color: #005C99;
+  background: rgba(0, 180, 232, 0.10);
 }
 
 .hint {
@@ -461,6 +510,7 @@ textarea {
   font-size: 0.9rem;
 }
 
+/* ── Map ── */
 .map {
   width: 100%;
   min-height: 420px;
@@ -469,43 +519,12 @@ textarea {
   border: 1px solid var(--border);
 }
 
-.chat-box {
-  border: 1px solid rgba(163, 192, 235, 0.26);
-  border-radius: 12px;
-  min-height: 260px;
-  max-height: 360px;
-  overflow-y: auto;
-  padding: 0.6rem;
-  display: grid;
-  gap: 0.44rem;
-  background: rgba(6, 16, 31, 0.75);
-}
-
-.chat-message {
-  max-width: 78%;
-  padding: 0.45rem 0.62rem;
-  border-radius: 10px;
-  background: rgba(15, 39, 74, 0.98);
-  border: 1px solid rgba(163, 192, 235, 0.26);
-}
-
-.chat-message.is-own {
-  margin-left: auto;
-  background: rgba(213, 255, 47, 0.14);
-  border-color: rgba(213, 255, 47, 0.5);
-}
-
-.chat-message small {
-  display: block;
-  margin-top: 0.24rem;
-  color: #89a5cb;
-}
-
+/* ── Result card ── */
 .result-card strong {
   font-family: "Barlow Condensed", sans-serif;
   font-size: 1.24rem;
   letter-spacing: 0.04em;
-  color: var(--accent);
+  color: var(--primary);
 }
 
 .card ul {
@@ -519,26 +538,28 @@ textarea {
 }
 
 a {
-  color: #8fd6ff;
+  color: var(--primary);
 }
 
 a:hover {
-  color: #c4ebff;
+  color: var(--ao-sky);
 }
 
+/* ── Toast ── */
 .toast {
   position: fixed;
   right: 1rem;
   bottom: 1rem;
-  background: rgba(4, 11, 22, 0.96);
-  border: 1px solid rgba(213, 255, 47, 0.55);
-  color: #ebff95;
+  background: var(--ao-navy);
+  border: 1px solid rgba(0, 180, 232, 0.6);
+  color: #a8e8ff;
   padding: 0.64rem 0.9rem;
   border-radius: 10px;
   opacity: 0;
   transform: translateY(12px);
   pointer-events: none;
   transition: opacity 0.24s ease, transform 0.24s ease;
+  box-shadow: 0 8px 24px rgba(0, 20, 60, 0.28);
 }
 
 .toast.is-visible {
@@ -546,51 +567,12 @@ a:hover {
   transform: translateY(0);
 }
 
+/* ── Leaflet popup ── */
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-  background: #0f2748;
-  color: #ecf4ff;
-}
-
-@media (max-width: 980px) {
-  .site-header {
-    grid-template-columns: 1fr;
-  }
-
-  .status-chip {
-    justify-self: start;
-  }
-
-  .grid-two {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  body {
-    padding: 1rem;
-  }
-
-  .tab-nav {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-  }
-
-  .tab-button {
-    flex: 0 0 auto;
-  }
-
-  .hero-tags span {
-    font-size: 0.7rem;
-  }
-
-  .metric-value {
-    font-size: 1.45rem;
-  }
-
-  .map {
-    min-height: 320px;
-  }
+  background: var(--ao-navy);
+  color: #e8f4ff;
+  box-shadow: 0 6px 20px rgba(0, 10, 40, 0.36);
 }
 
 /* ── Player Card ── */
@@ -607,18 +589,20 @@ a:hover {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 0.75rem 0.9rem;
-  background: var(--surface-soft);
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  background: var(--surface);
+  box-shadow: 0 2px 12px rgba(0, 60, 160, 0.07);
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .player-card:hover {
-  border-color: rgba(213, 255, 47, 0.4);
+  border-color: var(--ao-sky);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 87, 204, 0.13);
 }
 
 .player-card.is-self {
-  border-color: rgba(0, 168, 255, 0.5);
-  background: rgba(0, 80, 160, 0.22);
+  border-color: var(--ao-sky);
+  background: linear-gradient(135deg, #f0f8ff, #e4f2ff);
 }
 
 .player-card__photo {
@@ -627,8 +611,8 @@ a:hover {
   height: 60px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid rgba(163, 192, 235, 0.35);
-  background: rgba(15, 45, 89, 0.8);
+  border: 2px solid rgba(0, 150, 224, 0.35);
+  background: #e4f0ff;
 }
 
 .player-card__photo img {
@@ -646,7 +630,8 @@ a:hover {
   font-family: "Barlow Condensed", sans-serif;
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--primary);
+  background: linear-gradient(135deg, #dff0ff, #c8e4ff);
 }
 
 .player-card__body {
@@ -669,16 +654,16 @@ a:hover {
   font-family: "Barlow Condensed", sans-serif;
   font-size: 1.15rem;
   letter-spacing: 0.03em;
-  color: #eaf3ff;
+  color: var(--ao-navy);
 }
 
 .player-card__ntrp {
   font-family: "Barlow Condensed", sans-serif;
   font-size: 0.85rem;
   font-weight: 700;
-  border: 1px solid rgba(213, 255, 47, 0.6);
-  color: var(--accent);
-  background: rgba(213, 255, 47, 0.1);
+  border: 1px solid rgba(0, 87, 204, 0.45);
+  color: var(--primary);
+  background: rgba(0, 112, 212, 0.09);
   border-radius: 999px;
   padding: 0.1rem 0.52rem;
 }
@@ -720,10 +705,10 @@ a:hover {
 
 /* ── NTRP inline assessment ── */
 .ntrp-section {
-  border: 1px solid rgba(163, 192, 235, 0.22);
+  border: 1px solid rgba(0, 87, 204, 0.18);
   border-radius: 12px;
   padding: 0.75rem;
-  background: rgba(8, 20, 40, 0.5);
+  background: #f4f9ff;
 }
 
 .ntrp-header {
@@ -771,9 +756,9 @@ a:hover {
   margin-top: 0.6rem;
   padding: 0.45rem 0.6rem;
   border-radius: 8px;
-  background: rgba(213, 255, 47, 0.08);
-  border: 1px solid rgba(213, 255, 47, 0.3);
-  color: #e5ff80;
+  background: rgba(0, 112, 212, 0.07);
+  border: 1px solid rgba(0, 150, 224, 0.35);
+  color: var(--primary);
 }
 
 /* ── Match result item ── */
@@ -794,7 +779,7 @@ a:hover {
   font-family: "Barlow Condensed", sans-serif;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--primary);
 }
 
 .match-score-reason {
@@ -807,7 +792,8 @@ a:hover {
 }
 
 .invite-target-preview .player-card {
-  background: rgba(0, 50, 100, 0.28);
+  background: linear-gradient(135deg, #eef8ff, #e0f0ff);
+  border-color: rgba(0, 150, 224, 0.3);
 }
 
 .invite-item {
@@ -816,7 +802,47 @@ a:hover {
   gap: 0.2rem;
 }
 
+/* ── Responsive ── */
+@media (max-width: 980px) {
+  .site-header {
+    grid-template-columns: 1fr;
+  }
+
+  .status-chip {
+    justify-self: start;
+  }
+
+  .grid-two {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
+  body {
+    padding: 1rem;
+  }
+
+  .tab-nav {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .tab-button {
+    flex: 0 0 auto;
+  }
+
+  .hero-tags span {
+    font-size: 0.7rem;
+  }
+
+  .metric-value {
+    font-size: 1.45rem;
+  }
+
+  .map {
+    min-height: 320px;
+  }
+
   .player-card-grid {
     grid-template-columns: 1fr;
   }
@@ -825,4 +851,669 @@ a:hover {
     flex-direction: column;
     align-items: stretch;
   }
+
+  .gear-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tournament-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   運動裝備頁面 (Equipment Page)
+   ══════════════════════════════════════════════ */
+
+/* 分類篩選器 */
+.gear-category-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.gear-cat-btn {
+  border: 1px solid rgba(0, 71, 160, 0.24);
+  border-radius: 999px;
+  background: rgba(240, 248, 255, 0.9);
+  color: var(--primary);
+  padding: 0.38rem 0.88rem;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.gear-cat-btn:hover {
+  border-color: var(--ao-sky);
+  background: rgba(0, 143, 216, 0.09);
+}
+
+.gear-cat-btn.is-active {
+  background: linear-gradient(110deg, var(--ao-sky), var(--ao-royal) 70%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 3px 12px rgba(0, 71, 160, 0.28);
+}
+
+/* 裝備卡片格線 */
+.gear-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+/* 單張裝備卡 */
+.gear-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.gear-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--ao-sky);
+  box-shadow: var(--shadow-lg);
+}
+
+.gear-card__img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, #ddeeff 0%, #c0d8f8 50%, #a8c8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.gear-card__img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0, 20, 58, 0.12) 100%);
+}
+
+.gear-card__body {
+  padding: 0.85rem 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.gear-card__category {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ao-sky);
+}
+
+.gear-card__name {
+  margin: 0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.22rem;
+  letter-spacing: 0.03em;
+  color: var(--ao-navy);
+}
+
+.gear-card__brand {
+  color: var(--muted);
+  font-size: 0.83rem;
+}
+
+.gear-card__rating-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.4rem;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 0.1rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.star {
+  color: var(--star-empty);
+}
+
+.star.is-filled {
+  color: var(--star-gold);
+}
+
+.star.is-half {
+  position: relative;
+  color: var(--star-empty);
+}
+
+.star.is-half::before {
+  content: "★";
+  position: absolute;
+  left: 0;
+  width: 50%;
+  overflow: hidden;
+  color: var(--star-gold);
+}
+
+.rating-count {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* 裝備詳情面板 */
+.gear-detail {
+  display: none;
+  animation: fade-up 0.28s ease;
+}
+
+.gear-detail.is-open {
+  display: block;
+}
+
+.gear-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.gear-back-btn {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.gear-detail-img {
+  width: 100%;
+  max-height: 280px;
+  background: linear-gradient(135deg, #ddeeff 0%, #c0d8f8 60%, #a8c8f0 100%);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+}
+
+.gear-detail-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.8rem;
+}
+
+.gear-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.6rem;
+  margin: 0.8rem 0;
+}
+
+.gear-spec-item {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+}
+
+.gear-spec-item dt {
+  font-size: 0.76rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.15rem;
+}
+
+.gear-spec-item dd {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ao-navy);
+}
+
+/* 評論區塊 */
+.review-section {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.review-section h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
+}
+
+.review-form-wrap {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.review-form-wrap h4 {
+  margin: 0 0 0.7rem;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.05rem;
+  color: var(--ao-navy);
+}
+
+/* 星評選擇器 */
+.star-picker {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.6rem;
+}
+
+.star-picker-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: var(--star-empty);
+  padding: 0.1rem;
+  transition: color 0.15s ease, transform 0.15s ease;
+  line-height: 1;
+}
+
+.star-btn:hover,
+.star-btn.is-active {
+  color: var(--star-gold);
+  transform: scale(1.2);
+}
+
+/* 單則評論 */
+.review-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  background: var(--surface-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.review-item__header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.review-item__author {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--ao-navy);
+}
+
+.review-item__date {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.review-item__body {
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+/* ══════════════════════════════════════════════
+   賽事資訊頁面 (Tournament Page)
+   ══════════════════════════════════════════════ */
+
+/* 頂部資訊列 */
+.tournament-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.data-source-notice {
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: var(--surface-strong);
+  border: 1px dashed rgba(0, 71, 160, 0.28);
+  border-radius: 8px;
+  padding: 0.35rem 0.7rem;
+  margin-left: auto;
+}
+
+/* 賽事篩選 */
+.tournament-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.1rem;
+}
+
+.tour-filter-btn {
+  border: 1px solid rgba(0, 71, 160, 0.24);
+  border-radius: 999px;
+  background: rgba(240, 248, 255, 0.9);
+  color: var(--primary);
+  padding: 0.32rem 0.82rem;
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.tour-filter-btn:hover {
+  border-color: var(--ao-sky);
+  background: rgba(0, 143, 216, 0.09);
+}
+
+.tour-filter-btn.is-active {
+  background: linear-gradient(110deg, var(--ao-sky), var(--ao-royal) 70%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 3px 10px rgba(0, 71, 160, 0.26);
+}
+
+/* 賽事格線 */
+.tournament-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.1rem;
+}
+
+/* 單張賽事卡 */
+.tournament-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.tournament-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--ao-sky);
+  box-shadow: var(--shadow-lg);
+}
+
+.tournament-card__banner {
+  height: 130px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 0.8rem;
+  overflow: hidden;
+}
+
+.tournament-card__banner-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.4s ease;
+}
+
+.tournament-card:hover .tournament-card__banner-bg {
+  transform: scale(1.04);
+}
+
+.tournament-card__banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 10, 30, 0.1) 0%, rgba(0, 20, 60, 0.65) 100%);
+}
+
+.tournament-card__tier {
+  position: relative;
+  z-index: 1;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: rgba(0, 71, 160, 0.75);
+  border: 1px solid rgba(0, 194, 232, 0.5);
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+}
+
+.tournament-card__tier.is-grand-slam {
+  background: rgba(0, 0, 0, 0.55);
+  border-color: var(--star-gold);
+  color: var(--star-gold);
+}
+
+.tournament-card__body {
+  padding: 0.85rem 1rem;
+}
+
+.tournament-card__name {
+  margin: 0 0 0.2rem;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: 0.03em;
+  color: var(--ao-navy);
+}
+
+.tournament-card__sub {
+  font-size: 0.83rem;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.8rem;
+}
+
+.tournament-card__sub span::before {
+  margin-right: 0.25rem;
+}
+
+.tournament-card__status {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* 狀態徽章 */
+.badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #D92B0E;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.52rem;
+  border-radius: 999px;
+}
+
+.badge-live::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.badge-upcoming {
+  background: rgba(0, 143, 216, 0.13);
+  color: var(--ao-blue);
+  border: 1px solid rgba(0, 143, 216, 0.35);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+}
+
+.badge-completed {
+  background: rgba(61, 96, 128, 0.10);
+  color: var(--muted);
+  border: 1px solid rgba(61, 96, 128, 0.25);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+}
+
+/* 賽事詳情面板 */
+.tournament-detail {
+  display: none;
+  animation: fade-up 0.28s ease;
+}
+
+.tournament-detail.is-open {
+  display: block;
+}
+
+.tournament-detail__banner {
+  width: 100%;
+  height: 200px;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border);
+}
+
+.tournament-detail__content {
+  position: relative;
+  z-index: 1;
+}
+
+.tournament-detail__title {
+  margin: 0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.tournament-detail__subtitle {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+
+/* 賽事資訊格線 */
+.tournament-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.7rem;
+  margin: 1rem 0;
+}
+
+.tournament-info-block {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+}
+
+.tournament-info-block dt {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+}
+
+.tournament-info-block dd {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ao-navy);
+}
+
+/* 實況 / 分數 Stub 區塊 */
+.live-stub-banner {
+  background: linear-gradient(120deg, #00143A 0%, #0047A0 60%, #0066CC 100%);
+  border-radius: 14px;
+  padding: 1.4rem 1.2rem;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.live-stub-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,0.02) 0px,
+    rgba(255,255,255,0.02) 1px,
+    transparent 1px,
+    transparent 60px
+  );
+}
+
+.live-stub-title {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.live-stub-desc {
+  font-size: 0.87rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.6;
+}
+
+.live-stub-hooks {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.hook-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid rgba(0, 194, 232, 0.55);
+  color: var(--ao-cyan);
+  background: rgba(0, 194, 232, 0.1);
+  border-radius: 6px;
+  padding: 0.18rem 0.52rem;
+  font-family: monospace;
 }

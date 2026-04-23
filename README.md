@@ -1,6 +1,6 @@
 # Earth Tennis Club
 
-Earth Tennis Club 是一個可直接部署到 **GitHub Pages** 的前端網球社群平台，提供：
+Earth Tennis Club 是一個可直接部署到 **GitHub Pages** 的前端網球社群平台，視覺風格採用 **2026 澳網（Australian Open）藍白漸層色調**，提供：
 
 - **球員卡系統**：每位球員可建立個人球員卡，包含照片、性別、身高、年齡、球齡、擅長打法與可打球時段
 - **NTRP 自我評估**：整合於球員卡編輯頁，透過技術問卷估算 NTRP 等級
@@ -111,6 +111,24 @@ npm run dev
 - `backend/docs/JWT_FLOW.md` — Token 輪換與重放偵測流程
 - `backend/docs/ARCHITECTURE.md` — 架構決策說明
 
-## 9. 開發規格文件（SDD）
+## 9. 視覺設計系統
+
+採用 **2026 澳網藍白漸層**風格，以下為主要色彩變數：
+
+| 變數 | 色碼 | 用途 |
+|------|------|------|
+| `--ao-navy` | `#001840` | 深藍底色、Hero 區塊背景 |
+| `--ao-royal` | `#0052A8` | 皇家藍、按鈕漸層 |
+| `--ao-blue` | `#0070D4` | 主強調色、Tab active 狀態 |
+| `--ao-sky` | `#0096E0` | 天空藍、按鈕漸層起點 |
+| `--ao-cyan` | `#00B4E8` | 青色亮點、徽章色 |
+
+- 主體背景：淺藍白漸層 `#f2f8ff → #e0eeff → #d2e8ff`
+- Hero 區塊：保留深色 AO Navy 確保白字對比
+- 卡片：白色表面搭配藍色框線
+
+字型：標題 `Barlow Condensed`，內文 `Noto Sans TC`
+
+## 10. 開發規格文件（SDD）
 
 - `SDD-zh.md` — 完整設計說明文件（繁體中文）
