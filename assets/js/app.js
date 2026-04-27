@@ -11,6 +11,7 @@ import { createCourtService } from "./services/court-service.js";
 import { createForumService } from "./services/forum-service.js";
 import { createMemberService } from "./services/member-service.js";
 import { createInviteService } from "./services/invite-service.js";
+import { createBuddyService } from "./services/buddy-service.js";
 import { createEquipmentService } from "./services/equipment-service.js";
 import { createTournamentService } from "./services/tournament-service.js";
 import { createMatchRecordService } from "./services/match-record-service.js";
@@ -18,6 +19,7 @@ import { createLookingForService } from "./services/looking-for-service.js";
 import { createRateLimiter } from "./services/security-service.js";
 import { createStorageService } from "./services/storage-service.js";
 import { qsa } from "./ui/dom.js";
+import { initTabRipple, initCountUp, initBallTrail } from "./animations.js";
 
 const storage = createStorageService(APP_CONFIG.storageNamespace);
 const api = createApiService(APP_CONFIG.api);
@@ -27,6 +29,7 @@ const memberService       = createMemberService(storage, api);
 const courtService        = createCourtService(storage, api);
 const forumService        = createForumService(storage, api);
 const inviteService       = createInviteService(storage);
+const buddyService        = createBuddyService(storage);
 const equipmentService    = createEquipmentService(storage);
 const tournamentService   = createTournamentService();
 const matchRecordService  = createMatchRecordService(storage);
@@ -93,6 +96,8 @@ matchingModule = initMatchingModule({
 inviteModule = initInviteModule({
   memberService,
   inviteService,
+  buddyService,
+  matchRecordService,
   rateLimiter,
   inviteLimit: APP_CONFIG.security.chatPerMinute,
   notify,
@@ -125,4 +130,7 @@ initTournamentModule({
 });
 
 initTabs();
+initTabRipple();
+initCountUp();
+initBallTrail();
 notify("Earth Tennis Club 已啟動");

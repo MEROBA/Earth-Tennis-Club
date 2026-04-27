@@ -1,6 +1,69 @@
 import { createNode, renderList } from "../ui/dom.js";
 import { QUESTIONNAIRE_ITEMS } from "../data/questionnaire.js";
 import { evaluateTennisLevel } from "../services/scoring-service.js";
+import { burstConfetti } from "../animations.js";
+
+/* ── Radar chart constants ── */
+const RADAR_SKILL_KEYS = ["skill_forehand", "skill_backhand", "skill_volley", "skill_slice", "skill_dropshot", "skill_lob"];
+const RADAR_LABELS = ["正手拍", "反手拍", "截擊", "切球", "短球", "高球"];
+
+function buildRadarChartSVG(member) {
+  const SIZE = 320, CX = 160, CY = 160, CHART_R = 92, LABEL_R = 125, N = 6;
+  const ntrp = Number(member.ntrp) || 3.0;
+  // Weight: NTRP 1.5 → 0.50, NTRP 4.0 → 0.77, NTRP 7.0 → 1.00
+  const weight = 0.5 + 0.5 * Math.min(1, (ntrp - 1.5) / 5.5);
+
+  const rawVals = RADAR_SKILL_KEYS.map((k) => Math.max(1, Math.min(10, Number(member[k] ?? 5))));
+  const wVals = rawVals.map((v) => parseFloat(Math.min(10, v * weight).toFixed(1)));
+
+  function angle(idx) { return (2 * Math.PI * idx / N) - Math.PI / 2; }
+  function polar(idx, val, max = 10) {
+    const r = (val / max) * CHART_R;
+    return [CX + r * Math.cos(angle(idx)), CY + r * Math.sin(angle(idx))];
+  }
+  function polyPts(vals) {
+    return vals.map((v, i) => polar(i, v).map((c) => c.toFixed(1)).join(",")).join(" ");
+  }
+
+  const grid = [2, 4, 6, 8, 10].map((lv) => {
+    const pts = Array.from({ length: N }, (_, i) => polar(i, lv).map((c) => c.toFixed(1)).join(",")).join(" ");
+    return `<polygon points="${pts}" fill="none" stroke="rgba(0,71,160,${lv === 10 ? 0.22 : 0.1})" stroke-width="${lv === 10 ? 1.5 : 1}"/>`;
+  }).join("");
+
+  const axes = Array.from({ length: N }, (_, i) => {
+    const [x2, y2] = polar(i, 10);
+    return `<line x1="${CX}" y1="${CY}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="rgba(0,71,160,0.12)" stroke-width="1"/>`;
+  }).join("");
+
+  const rawPoly = `<polygon points="${polyPts(rawVals)}" fill="rgba(0,194,232,0.07)" stroke="rgba(0,194,232,0.40)" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+  const wPoly = `<polygon points="${polyPts(wVals)}" fill="rgba(0,71,160,0.13)" stroke="#0047A0" stroke-width="2"/>`;
+  const dots = wVals.map((v, i) => {
+    const [px, py] = polar(i, v);
+    return `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="#0047A0" stroke="#fff" stroke-width="1.5"/>`;
+  }).join("");
+
+  // [text-anchor, name_dy_px, score_dy_px]
+  const LC = [
+    ["middle", -22, -8],  // 0 top: 正手拍
+    ["start",  -13,  2],  // 1 upper-right: 反手拍
+    ["start",    6, 20],  // 2 lower-right: 截擊
+    ["middle",  18, 32],  // 3 bottom: 切球
+    ["end",      6, 20],  // 4 lower-left: 短球
+    ["end",    -13,  2],  // 5 upper-left: 高球
+  ];
+
+  const labelsSVG = RADAR_LABELS.map((lbl, i) => {
+    const lx = CX + LABEL_R * Math.cos(angle(i));
+    const ly = CY + LABEL_R * Math.sin(angle(i));
+    const [anchor, ny, sy] = LC[i];
+    return `
+      <text x="${lx.toFixed(1)}" y="${(ly + ny).toFixed(1)}" text-anchor="${anchor}" font-size="12" font-weight="600" fill="#3D5166">${lbl}</text>
+      <text x="${lx.toFixed(1)}" y="${(ly + sy).toFixed(1)}" text-anchor="${anchor}" font-size="11" font-weight="700" fill="#0047A0">${wVals[i]}</text>
+    `;
+  }).join("");
+
+  return `<svg viewBox="0 0 ${SIZE} ${SIZE}" xmlns="http://www.w3.org/2000/svg" aria-label="技術能力雷達圖">${grid}${axes}${rawPoly}${wPoly}${dots}${labelsSVG}</svg>`;
+}
 
 const PLAY_STYLE_LABELS = {
   baseline: "底線型",
@@ -246,6 +309,7 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
       else winner = "draw";
       matchRecordService.updateRecord(rid, { sets, winner, status: "completed" });
       notify("比分已記錄！");
+      burstConfetti(e.currentTarget);
       openMemberDetail(member);
     });
   }
@@ -339,6 +403,28 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
           </div>
           <p style="font-size:0.88rem; color:var(--ink-secondary); margin-top:0.7rem; line-height:1.65;">
             ${ntrpDescription(Number(m.ntrp))}
+          </p>
+        </div>
+
+        <!-- 技術能力雷達圖 -->
+        <div class="card">
+          <h3 style="margin-bottom:0.8rem;">🎯 技術能力雷達圖</h3>
+          <div class="radar-chart-wrap">
+            ${buildRadarChartSVG(m)}
+          </div>
+          <div class="radar-legend">
+            <span class="radar-legend-item">
+              <svg width="28" height="10" style="display:inline-block;vertical-align:middle;"><line x1="0" y1="5" x2="28" y2="5" stroke="rgba(0,194,232,0.45)" stroke-width="1.5" stroke-dasharray="5,3"/></svg>
+              自評原始分
+            </span>
+            <span class="radar-legend-item">
+              <svg width="28" height="10" style="display:inline-block;vertical-align:middle;"><line x1="0" y1="5" x2="28" y2="5" stroke="#0047A0" stroke-width="2"/></svg>
+              NTRP 加權有效值
+            </span>
+          </div>
+          <p class="radar-ntrp-note">
+            加權係數 ${(0.5 + 0.5 * Math.min(1, (Number(m.ntrp) - 1.5) / 5.5)).toFixed(2)}（NTRP ${Number(m.ntrp).toFixed(1)}）。
+            藍色實線 = 自評分 × 加權係數，使不同 NTRP 等級的能力評估具可比性。
           </p>
         </div>
 
@@ -480,6 +566,12 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
   fillCitySelect(document.querySelector("#member-city"), cities);
   fillCitySelect(filterCity, cities, true);
 
+  // Skill slider live value display
+  form?.querySelectorAll(".skill-slider").forEach((slider) => {
+    const valSpan = slider.closest(".skill-row__control")?.querySelector(".skill-val");
+    if (valSpan) slider.addEventListener("input", () => { valSpan.textContent = slider.value; });
+  });
+
   // Photo upload
   let pendingPhoto = null;
   photoInput?.addEventListener("change", () => {
@@ -579,6 +671,15 @@ export function initMembersModule({ memberService, matchRecordService, cities, n
       photoPreview.style.display = "block";
       pendingPhoto = member.photo;
     }
+    // Prefill skill sliders
+    RADAR_SKILL_KEYS.forEach((key) => {
+      const input = form.querySelector(`[name="${key}"]`);
+      if (input) {
+        input.value = member[key] ?? 5;
+        const valSpan = input.closest(".skill-row__control")?.querySelector(".skill-val");
+        if (valSpan) valSpan.textContent = input.value;
+      }
+    });
   }
 
   function renderCurrentCard() {

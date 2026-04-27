@@ -25,6 +25,8 @@
     <div class="court-lines" aria-hidden="true"></div>
     <div class="glow-orb glow-left" aria-hidden="true"></div>
     <div class="glow-orb glow-right" aria-hidden="true"></div>
+    <div class="tennis-ball-bg tennis-ball-1" aria-hidden="true"></div>
+    <div class="tennis-ball-bg tennis-ball-2" aria-hidden="true"></div>
 
     <header class="site-header">
       <div class="hero-copy">
@@ -59,7 +61,7 @@
     <nav class="tab-nav" aria-label="主功能分頁">
       <button class="tab-button is-active" data-view="members">👤 球員管理</button>
       <button class="tab-button" data-view="matching">🤝 球友推薦</button>
-      <button class="tab-button" data-view="invite">📅 約打球</button>
+      <button class="tab-button" data-view="invite">🤝 球友清單</button>
       <button class="tab-button" data-view="courts">🗺️ 全台球場</button>
       <button class="tab-button" data-view="forum">💬 交流區</button>
       <button class="tab-button" data-view="equipment">🎽 運動裝備</button>
@@ -141,6 +143,52 @@
                       <button class="btn-secondary" id="ntrp-assess-submit" type="button">計算 NTRP</button>
                     </div>
                     <p id="ntrp-assess-result" class="hint ntrp-result" style="display:none;"></p>
+                  </div>
+                </div>
+
+                <!-- 技術能力自評（配合雷達圖） -->
+                <div class="skills-section">
+                  <div class="skills-section__header">
+                    <h4>🎯 技術能力自評</h4>
+                    <small class="hint">（1–10 分，配合 NTRP 加權，顯示於雷達圖）</small>
+                  </div>
+                  <div class="skills-grid">
+                    <label class="skill-row">正手拍
+                      <div class="skill-row__control">
+                        <input class="skill-slider" name="skill_forehand" type="range" min="1" max="10" step="1" value="5" />
+                        <span class="skill-val">5</span>
+                      </div>
+                    </label>
+                    <label class="skill-row">反手拍
+                      <div class="skill-row__control">
+                        <input class="skill-slider" name="skill_backhand" type="range" min="1" max="10" step="1" value="5" />
+                        <span class="skill-val">5</span>
+                      </div>
+                    </label>
+                    <label class="skill-row">截擊
+                      <div class="skill-row__control">
+                        <input class="skill-slider" name="skill_volley" type="range" min="1" max="10" step="1" value="5" />
+                        <span class="skill-val">5</span>
+                      </div>
+                    </label>
+                    <label class="skill-row">切球
+                      <div class="skill-row__control">
+                        <input class="skill-slider" name="skill_slice" type="range" min="1" max="10" step="1" value="5" />
+                        <span class="skill-val">5</span>
+                      </div>
+                    </label>
+                    <label class="skill-row">短球
+                      <div class="skill-row__control">
+                        <input class="skill-slider" name="skill_dropshot" type="range" min="1" max="10" step="1" value="5" />
+                        <span class="skill-val">5</span>
+                      </div>
+                    </label>
+                    <label class="skill-row">高球
+                      <div class="skill-row__control">
+                        <input class="skill-slider" name="skill_lob" type="range" min="1" max="10" step="1" value="5" />
+                        <span class="skill-val">5</span>
+                      </div>
+                    </label>
                   </div>
                 </div>
 
@@ -313,10 +361,35 @@
 
       </section>
 
-      <!-- 約打球 -->
+      <!-- 球友清單 -->
       <section class="view" id="view-invite" data-view="invite">
+
+        <!-- 球友清單主區塊 -->
+        <div class="card">
+          <div class="buddy-list-header">
+            <div>
+              <h2 style="margin:0;">🤝 球友清單</h2>
+              <p class="hint" style="margin:0.3rem 0 0;">新增球友、記錄對戰戰績，一鍵發起約球邀約。</p>
+            </div>
+            <button id="add-buddy-btn" class="btn-primary" type="button">+ 新增球友</button>
+          </div>
+
+          <!-- 新增球友面板（預設隱藏） -->
+          <div id="add-buddy-panel" style="display:none; margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;">
+            <h3 style="margin-bottom:0.6rem;">選擇要加入的球友</h3>
+            <div class="buddy-add-row">
+              <select id="buddy-add-select"></select>
+              <button id="confirm-add-buddy" class="btn-primary" type="button">加入</button>
+              <button id="cancel-add-buddy" class="btn-secondary" type="button">取消</button>
+            </div>
+          </div>
+
+          <div id="buddy-list" class="buddy-grid"></div>
+        </div>
+
+        <!-- 約球邀約功能 -->
         <div class="grid-two">
-          <div class="card">
+          <div class="card" id="invite-create-section">
             <h2>發出約球邀約</h2>
             <label>選擇邀請對象
               <select id="invite-target-select"></select>
@@ -336,6 +409,7 @@
             <div id="invite-list" class="list"></div>
           </div>
         </div>
+
       </section>
 
       <!-- 全台球場 -->
